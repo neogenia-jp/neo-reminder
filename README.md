@@ -11,7 +11,9 @@ bin/run-docker-compose-backend.sh up
 
 Visual Studio 2017 にて、Linux リモートデバッグの設定を行う。
 
-hostname: localhost
-port: 22
-user: neo
-password: neo
+| 設定項目   | 値 |
+|:----------|:--------|
+| hostname | localhost |
+| port     | 10022 |
+| user     | neo |
+| password | neo |

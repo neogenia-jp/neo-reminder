@@ -26,8 +26,6 @@ services:
     image: reminder_front_app
     ports:
       - "808:80"
-      - "1234:1234"
-      - "26162:26162"
     volumes:
       - ${RAILS_APP_ROOT_DIR}:${RAILS_APP_MOUNT_TO}
     environment:
@@ -48,7 +46,7 @@ services:
     build: $BACKEND_DOCKERFILE_DIR
     image: reminder_backend_svc
     ports:
-      - "22:22"
+      - "22:10022"
     hostname: backend_svc
     volumes:
       - ${BACKEND_SRC_ROOT_DIR}:/mnt
