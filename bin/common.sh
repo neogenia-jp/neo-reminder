@@ -22,11 +22,9 @@ export COMPOSE_PROJECT_NAME=rmd
 
 # front-app
 export RAILS_WEBAPP_DOCKERFILE_DIR=${SCRIPT_DIR}/../front-app/docker
-export RAILS_APP_ROOT_DIR=${SCRIPT_DIR}/../front-app/app/webapp
+export RAILS_APP_ROOT_DIR=${SCRIPT_DIR}/../front-app/src
 export RAILS_APP_MOUNT_TO=/var/rails
 export SCRIPTS_MOUNT_TO=/var/scripts
-export EXTERNAL_FILES_ROOT_DIR=${EXTERNAL_FILES_ROOT_DIR:-${SCRIPT_DIR}/../front-app/extfiles}
-export EXTERNAL_FILES_MOUNT_TO=/var/extfiles
 export RAILS_APP_ENV=${RAILS_APP_ENV:-development}
 
 # backend-svc

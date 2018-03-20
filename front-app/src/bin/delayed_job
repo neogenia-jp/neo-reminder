@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+require File.expand_path(File.join(File.dirname(__FILE__), '..', 'config', 'environment'))
+require 'delayed/command'
+
+# delayed_job内で実行されるsqlログは別ファイルにする
+ActiveRecord::Base.logger = Delayed::Worker.logger #initializerで設定しているloggerをActiveRecordにも設定
+
+Delayed::Command.new(ARGV).daemonize

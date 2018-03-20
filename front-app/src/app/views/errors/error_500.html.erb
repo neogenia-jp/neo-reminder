@@ -1,0 +1,18 @@
+<div class="error_page">
+  <div class="row">
+    <div class="col-xs-12 col-md-offset-2 col-md-8">
+      <div class="alert alert-danger" role="alert">
+        <div class="h1">システムエラー</div>
+        <p style="margin-top: 40px">
+          ページを表示できません。<br />
+          もう一度、操作をやり直してみてください。
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+<% if Rails.env != 'production' && exception.present?%>
+<pre class="hidden" id="__error_log">
+  <%= exception.pretty_log %>
+</pre>
+<% end %>

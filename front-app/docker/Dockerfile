@@ -29,27 +29,17 @@ RUN useradd neo \
 ARG rails_app_mount_to=/var/rails
 # アプリケーション制御スクリプトのコピー先
 ARG scripts_copy_to=/var/scripts
-# 外部ファイルのマウント先
-ARG external_files_mount_to=/var/extfiles
 
 ENV TERM=xterm \
     RAILS_ROOT_DIR=$rails_app_mount_to \
-    SCRIPTS_ROOT_DIR=$scripts_copy_to \
-    EXTERNAL_FILES_ROOT_DIR=$external_files_mount_to
+    SCRIPTS_ROOT_DIR=$scripts_copy_to
 
 #####################################################
 # add scripts
-ADD resources/monit/* /etc/monit/conf-available/
-RUN ln -s /etc/monit/conf-available/rails /etc/monit/conf-enabled/
 ADD resources/scripts $scripts_copy_to
-# monit設定ファイルに記載されている環境変数を置換
-RUN sed -i -e "s!@RAILS_ROOT_DIR!${RAILS_ROOT_DIR}!g" \
-           -e "s!@SCRIPTS_ROOT_DIR!${SCRIPTS_ROOT_DIR}!g" \
-           /etc/monit/conf-available/rails \
-           /etc/monit/conf-available/delayed_job
+RUN chmod +x $scripts_copy_to
 
-VOLUME $external_files_mount_to
-VOLUME $rails_app_mount_to
 WORKDIR $rails_app_mount_to
 
-EXPOSE 8082 1234 26162 22
+EXPOSE 8082 10022
+

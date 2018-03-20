@@ -1,0 +1,17 @@
+<html>
+  <head>
+        <%= javascript_include_tag 'application' %>
+  </head>
+  <body>
+    <div>
+      hello, <%= @msg %> <br>
+      session id: <%= session.id %>, session[:count]: <%= session[:count] %><br>
+
+      <input type="button" value="click" onclick="greet('hello, typescript ')" id="mybutton" />
+
+      <div>
+        <%= debug session %>
+      </div>
+  </body>
+</html>
+

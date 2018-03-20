@@ -22,10 +22,9 @@ services:
       args:
         - rails_app_mount_to=$RAILS_APP_MOUNT_TO
         - scripts_copy_to=$SCRIPTS_MOUNT_TO
-        - external_files_mount_to=$EXTERNAL_FILES_MOUNT_TO
     image: reminder_front_app
     ports:
-      - "808:80"
+      - "80:8082"
     volumes:
       - ${RAILS_APP_ROOT_DIR}:${RAILS_APP_MOUNT_TO}
     environment:
@@ -46,7 +45,7 @@ services:
     build: $BACKEND_DOCKERFILE_DIR
     image: reminder_backend_svc
     ports:
-      - "22:10022"
+      - "10022:22"
     hostname: backend_svc
     volumes:
       - ${BACKEND_SRC_ROOT_DIR}:/mnt

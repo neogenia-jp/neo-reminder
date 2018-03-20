@@ -1,0 +1,7 @@
+<div id="notifications">
+  <% flash.each do |c, value| -%>
+    <% if value.present? -%>
+      <%= content_tag(:p, value, class: c) %>
+    <% end %>
+  <% end -%>
+</div>

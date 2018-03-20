@@ -1,0 +1,16 @@
+<div class="error_page">
+    <div class="row">
+      <div class="col-xs-12 col-md-offset-1 col-md-10">
+        <div class="fukidashi" >
+          <p>ご不便をお掛けしております。</p>
+          <p>お探しのページが見つかりません。</p>
+        </div>
+        <%= image_tag 'hineno.png', width: 120 %>
+      </div>
+  </div>
+</div>
+<% if Rails.env != 'production' && exception.present?%>
+<pre class="hidden" id="__error_log">
+  <%= exception.pretty_log %>
+</pre>
+<% end %>
