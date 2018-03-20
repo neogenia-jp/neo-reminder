@@ -1,0 +1,1 @@
+FROM pocari/mailcatcher

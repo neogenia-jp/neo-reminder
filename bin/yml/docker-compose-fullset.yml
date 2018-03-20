@@ -1,0 +1,34 @@
+version: '2'
+
+volumes:
+  rails_vendor:
+    driver: local
+
+services:
+  mocksmtp:
+    extends:
+      file: docker-compose-base.yml
+      service: mocksmtp
+
+  redis_server:
+    extends:
+      file: docker-compose-base.yml
+      service: redis_server
+
+  front_app:
+    extends:
+      file: docker-compose-base.yml
+      service: front_app
+    volumes:
+      - ${EXTERNAL_FILES_ROOT_DIR}:${EXTERNAL_FILES_MOUNT_TO}
+      - rails_vendor:${RAILS_APP_MOUNT_TO}/vendor
+    depends_on:
+      - mocksmtp
+      - redis_server
+
+  backend_svc:
+    extends:
+      file: docker-compose-base.yml
+      service: backend_svc
+    volumes:
+      - ${BACKEND_SRC_ROOT_DIR}:/mnt

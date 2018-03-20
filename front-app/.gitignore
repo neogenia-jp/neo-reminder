@@ -1,0 +1,8 @@
+app/webapp/tmp/
+app/webapp/vendor/
+app/webapp/public/assets
+app/webapp/public/info_docs
+app/webapp/public/common_resources/semantic-ui/*
+app/webapp/node_modules
+
+extfiles/

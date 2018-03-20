@@ -1,0 +1,7 @@
+version: '2'
+
+services:
+  backend_svc:
+    extends:
+      file: docker-compose-base.yml
+      service: backend_svc

@@ -1,0 +1,7 @@
+version: '2'
+
+services:
+  redis_server:
+    extends:
+      file: docker-compose-base.yml
+      service: redis_server
