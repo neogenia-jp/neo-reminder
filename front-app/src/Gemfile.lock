@@ -240,6 +240,7 @@ PLATFORMS
 
 DEPENDENCIES
   coffee-rails (~> 4.1.0)
+  concurrent-ruby (= 1.0.5)
   daemons (~> 1.2.3)
   delayed_job (~> 4.1.4)
   delayed_job_active_record (~> 4.1.1)
