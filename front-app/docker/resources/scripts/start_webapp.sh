@@ -30,7 +30,7 @@ check_dir 'log'
 if [ "$1" = "manual" ] ; then
   echo '***** MANUAL MODE *****'
   echo "Prease exec below command on host:"
-  echo '  docker exec -ti backend_svc bash'
+  echo '  docker exec -ti front_app bash'
   exec tail -f /dev/null
   exit
 fi
