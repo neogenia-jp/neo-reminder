@@ -3,6 +3,8 @@ class ApplicationController < ActionController::Base
   # For APIs, you may want to use :null_session instead.
   protect_from_forgery with: :exception
 
+  layout "layouts/layout"
+
   # 例外ハンドラ
   rescue_from Exception,                      with: :render_500 unless Rails.env.development?
   rescue_from AppNotFoundError,               with: :render_404 unless Rails.env.development?

@@ -1,0 +1,59 @@
+<div id="vue-area">
+  <p v-if="loading">Loading...</p>
+
+  <template v-else>
+    <div v-for="element in list" class="reminder-list">
+      <input type="text" v-model="element.title"></input>
+      <span>{{ element.term }}<span>
+    </div>
+  </template>
+</div>
+
+<script type="text/javascript">
+  var vm = new Vue({
+    el: '#vue-area',
+    data: {
+      loading: true,
+      list: []    // view model
+    },
+    created: function() {
+      this.fetchData();
+    },
+    methods: {
+      fetchData: function() {
+        var that = this;
+
+        $.ajax({
+          type: "GET",
+          url: '/api/list',
+          success: function (response) {
+            that.list = response;
+            that.loading = false;
+          },
+          error: function () {
+            alert("エラーが発生しました。時間をおいてページを更新してください。");
+          }
+        });
+      },
+      postData: function() {
+        //if (!confirm("データを更新します。よろしいですか？")) return;
+
+        this.sending = true;
+        var that = this;
+        $.ajax({
+          type: "POST",
+          url: '/api/create',
+          data: this.$data,
+          success: function () {
+            //that.sending = false;
+            //setTimeout(function(){alert("データが更新されました。")}, 100);
+          },
+          error: function () {
+            //that.sending = false;
+            setTimeout(function(){alert("エラーが発生しました。時間をおいてもう一度お試しください。")}, 100);
+          }
+        });
+      }
+    }
+  });
+</script>
