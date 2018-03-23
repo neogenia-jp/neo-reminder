@@ -7,7 +7,6 @@ require 'test/unit'
 
 class MainTest < Test::Unit::TestCase
   def test_main
-    assert_equal '{status: "ok"}', ::Kamada::main("")
+    assert_equal '{status: "ok"}', ::Yamamoto::main("")
   end
 end
-
