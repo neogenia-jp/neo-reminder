@@ -12,14 +12,16 @@ require 'json'
 require_relative "./#{ENV['ROUTE'].downcase}/test_data_operator"
 
 class CommonTest < Test::Unit::TestCase
+  @@test_data_operator = ::MODULE::TestDataOperator.new
+
   # テストケースごとに最初に呼ばれるメソッド
   def setup
-    ::MODULE::TestDataOperator.create
+    @@test_data_operator.send("create_#{method_name}_data")
   end
 
   # テストケースごとに最後に呼ばれるメソッド
   def teardown
-    ::MODULE::TestDataOperator.clean
+    @@test_data_operator.send("clean_#{method_name}_data")
   end
 
   # 全TODOリスト取得テスト

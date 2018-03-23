@@ -1,11 +1,15 @@
 module Kamada
   class TestDataOperator
-    def self.create
+    def create_test_list_api_all_data
       puts "Kamada Data Create!!"
     end
 
-    def self.clean
-      puts "Kamada Data Crean!!"
+    def clean_test_list_api_all_data
+      puts "Kamada Data Create!!"
+    end
+
+    def method_missing(method_name)
+      # 何もしない
     end
   end
 end
