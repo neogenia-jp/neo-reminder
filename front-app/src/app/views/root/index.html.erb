@@ -27,7 +27,9 @@
           title: vm.input_text
         }
       },
-      success: function () {
+      success: function (response) {
+        let output = JSON.parse(response.output);
+        console.log(output);
         vm.input_text = '';
         //that.sending = false;
         setTimeout(function(){ callApiList(vm); }, 100);
@@ -44,7 +46,9 @@
       type: "GET",
       url: '/api/list',
       success: function (response) {
-        vm.list = response.list;
+        let output = JSON.parse(response.output);
+        console.log(output);
+        vm.list = output.list;
         vm.loading = false;
       },
       error: function () {

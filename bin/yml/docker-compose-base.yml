@@ -38,6 +38,7 @@ services:
       SMTP_PORT           :
       SMTP_USER_NAME      :
       SMTP_PASSWORD       :
+      RPC_SERVER_PORT     :
     command: ${SCRIPTS_MOUNT_TO}/start_webapp.sh $DEBUG
 
   backend_svc:
@@ -53,3 +54,6 @@ services:
       - SYS_PTRACE
     security_opt:
       - seccomp:unconfined
+    environment:
+      RPC_SERVER_PORT     :
+

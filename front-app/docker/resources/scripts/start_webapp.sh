@@ -27,6 +27,8 @@ check_dir 'tmp'
 # Check "log" directory's permission.
 check_dir 'log'
 
+echo "RPC_SERVER_PORT=$RPC_SERVER_PORT"
+
 if [ "$1" = "manual" ] ; then
   echo '***** MANUAL MODE *****'
   echo "Prease exec below command on host:"
@@ -52,10 +54,9 @@ if [ "$RAILS_ENV" = "production" ]; then
 fi
 
 # PIDファイルを削除
-rm tmp/puma.pid 2>/dev/null
+rm /var/rails/tmp/pids/server.pid 2>/dev/null
 
 bin/delayed_job start
 
 bin/rails s -b 0.0.0.0 -p 8082
-
 
