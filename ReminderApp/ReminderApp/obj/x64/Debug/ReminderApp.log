@@ -1,0 +1,8 @@
+﻿  Validating architecture
+  Validating sources
+  Copying sources remotely to 'localhost'
+  Starting remote build
+  Compiling sources:
+  main.cpp
+  Linking objects
+  ReminderApp.vcxproj -> C:\Users\H.Moriguchi\Source\Repos\ReminderApp\ReminderApp\bin\x64\Debug\ReminderApp.out
