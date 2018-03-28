@@ -19,6 +19,12 @@ class ApiController < ApplicationController
   end
 
   def create
+    result = {
+      status: "ok",
+      message: "created."
+    }
+
+    render json: result
   end
 
   def edit
