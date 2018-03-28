@@ -25,9 +25,7 @@ module XMLRPC
       # @param route      [String] ルーティング文字列
       # @param input_data [String] 受け渡す入力データ
       def exec_command(route, input_data)
-        result = JSON.parse create_default_client.call("exec_command", route, input_data)
-        logger.debug result
-        result
+        JSON.parse create_default_client.call("exec_command", route, input_data)
       end
     end
   end
