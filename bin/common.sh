@@ -11,6 +11,9 @@ source_if_exists () {
   fi
 }
 
+# for Windows
+export COMPOSE_CONVERT_WINDOWS_PATHS=1
+
 # 環境変数
 source_if_exists $SCRIPT_DIR/env_config/env_app.sh
 
