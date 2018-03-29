@@ -20,13 +20,13 @@ services:
     build:
       context: $RAILS_WEBAPP_DOCKERFILE_DIR
       args:
-        - rails_app_mount_to=$RAILS_APP_MOUNT_TO
-        - scripts_copy_to=$SCRIPTS_MOUNT_TO
+        - rails_app_mount_to=/var/rails
+        - scripts_copy_to=/var/scripts
     image: reminder_front_app
     ports:
       - "80:8082"
     volumes:
-      - ${RAILS_APP_ROOT_DIR}:${RAILS_APP_MOUNT_TO}
+      - ${RAILS_APP_ROOT_DIR}:/var/rails
     environment:
       DEBUG               :
       DOCKER_HOST_HOSTNAME:
@@ -39,7 +39,7 @@ services:
       SMTP_USER_NAME      :
       SMTP_PASSWORD       :
       RPC_SERVER_PORT     :
-    command: ${SCRIPTS_MOUNT_TO}/start_webapp.sh $DEBUG
+    command: /var/scripts/start_webapp.sh
 
   backend_svc:
     container_name: backend_svc
