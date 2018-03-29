@@ -29,7 +29,7 @@ check_dir 'log'
 
 echo "RPC_SERVER_PORT=$RPC_SERVER_PORT"
 
-if [ "$1" = "manual" ] ; then
+if [ "$DEBUG" = "manual" ] ; then
   echo '***** MANUAL MODE *****'
   echo "Prease exec below command on host:"
   echo '  docker exec -ti front_app bash'
