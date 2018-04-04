@@ -1,8 +1,8 @@
 #!/bin/bash
 
 case $ROUTE in
-  "moriguchi" ) exec CppBackendSvc/entry_point.sh ;;
-  "maeda"     ) exec CppBackendSvc/entry_point.sh ;;
+  "moriguchi" ) exec CppBackendSvc/entrypoint.sh ;;
+  "maeda"     ) exec CppBackendSvc/entrypoint.sh ;;
   "yamamoto"  ) exec ruby ruby_backend_svc/src/entrypoint.rb ;;
   "yoneoka"   ) exec ruby ruby_backend_svc/src/entrypoint.rb ;;
   "kamada"    ) exec ruby ruby_backend_svc/src/entrypoint.rb ;;
