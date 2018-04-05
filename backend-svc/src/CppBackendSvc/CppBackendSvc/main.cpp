@@ -1,6 +1,8 @@
 #include <cstdio>
 #include <fstream>
-
+#include <sqlite/connection.hpp>
+#include <sqlite/execute.hpp>
+#include <sqlite/query.hpp>
 #include "main.h"
 
 using namespace std;
@@ -65,6 +67,9 @@ void f_Delete(
 
 int main(int argc, const char *args[])
 {
+    sqlite::connection con("test.db");
+
+
     auto filepath = "/dev/stdin";
 
     if (argc >= 2) {
@@ -120,6 +125,6 @@ int main(int argc, const char *args[])
     // 文字列にするためにvalueを使用
     picojson::value val(result);
 
-    std::cout << val.serialize();
+    cout << val.serialize();
     return 0;
 }
