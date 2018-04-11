@@ -1,0 +1,1 @@
+g++ -o "/home/neo/projects/ReminderApp/bin/x64/Debug/ReminderApp.out" -Wl,--no-undefined -Wl,-z,relro -Wl,-z,now -Wl,-z,noexecstack /home/neo/projects/ReminderApp/obj/x64/Debug/main.o
