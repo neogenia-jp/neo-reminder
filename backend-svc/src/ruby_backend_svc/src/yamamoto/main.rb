@@ -1,4 +1,5 @@
 require 'json'
+Dir[File.dirname(__FILE__) + '/*.rb'].each {|file| require file }
 
 module Yamamoto
   def self.main(request_json)
@@ -9,7 +10,7 @@ module Yamamoto
     api = ApiFactory.get(json_data['command'])
 
     # 実行
-    api.run(json_data)
+    api.run(json_data).to_json
   end
 end
 

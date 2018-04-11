@@ -1,16 +1,20 @@
 require 'json'
+require 'singleton'
 
 module Yamamoto
   class DataAccessor
+    include Singleton
     def initialize
-      @data_base_path = File.expand_path("./data/")
+      @data_base_path = File.join(File.dirname(__FILE__), 'data')
     end
 
-    # ファイル読み込み
+    # データ読み込み
     # @param id [Integer] ファイルID
-    # @return [String] 読み込んだファイルの内容
+    # @return [Hash] 読み込んだファイルの内容
     def read(id)
-      File.read(File.join(@data_base_path, "#{id}.json"))
+      result = JSON.parse(File.read(File.join(@data_base_path, "#{id}.json")))
+      result['id'] = id
+      result
     end
 
     # 全件取得
@@ -22,10 +26,11 @@ module Yamamoto
     end
 
     # 新規作成
-    # @return [String] 書き込んだ内容
-    def create(json_str)
-      # TODO: ファイルロック
-      File.write(File.join(@data_base_path, "#{next_id}.json"), json_str)
+    # @param contents [Hash] ファイルに書き込む内容
+    # @return [Integer] 書き込んだバイト数
+    def create(contents)
+      # TODO: ファイルの存在確認
+      File.write(File.join(@data_base_path, "#{next_id}.json"), contents.to_json)
     end
 
     # 次のID

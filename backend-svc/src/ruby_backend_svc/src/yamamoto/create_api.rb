@@ -7,7 +7,7 @@ module Yamamoto
       result = {}
 
       begin
-        @data_accessor.create(json_data["options"].to_s)
+        @data_accessor.create(json_data["options"])
         result[:status] = 'ok'
         result[:message] = ''
       rescue => e
@@ -15,7 +15,7 @@ module Yamamoto
         result[:message] = e.message
       end
 
-      result.to_json
+      result
     end
   end
 end

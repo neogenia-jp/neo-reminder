@@ -1,10 +1,10 @@
 module Yamamoto
   class BaseApi
     def initialize
-      @data_accessor = DataAccessor.new
+      @data_accessor = DataAccessor.instance
     end
 
-    def run(json_string)
+    def run(json_data)
       raise NotImplementedError "サブクラスで実装してください。"
     end
   end
