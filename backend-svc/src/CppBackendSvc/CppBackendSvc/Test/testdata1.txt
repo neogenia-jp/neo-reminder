@@ -1,0 +1,6 @@
+{
+  "command": "list",
+  "options": {
+    "condition": "all"
+  }
+}

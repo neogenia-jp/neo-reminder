@@ -20,6 +20,12 @@ ENV TERM=xterm
 RUN apt-get update \
     && apt-get install -y gdb openssh-server \
     moreutils
+    
+RUN apt-get install -y \
+  libboost-dev \
+  libsqlite3-dev \
+  libvsqlitepp-dev \
+  sqlite3
 
 # add user
 RUN useradd neo -m -s /bin/bash \
