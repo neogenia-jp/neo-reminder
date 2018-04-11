@@ -20,7 +20,7 @@ services:
       file: docker-compose-base.yml
       service: front_app
     volumes:
-      - rails_vendor:${RAILS_APP_MOUNT_TO}/vendor
+      - rails_vendor:/var/rails/vendor
     depends_on:
       - mocksmtp
       - redis_server

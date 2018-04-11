@@ -15,3 +15,6 @@ export SMTP_PASSWORD=dummy
 
 # hosting domain
 export APP_DOMAIN=reminder.neogenia.co.jp
+
+export RPC_SERVER_PORT=18089
+

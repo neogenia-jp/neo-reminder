@@ -16,21 +16,16 @@ module XMLRPC
 
       # デフォルト設定が行われた xml_rpc client を生成します
       def create_default_client
-        XMLRPC::Client.new2("http://php_alweb:#{ENV['XML_RPC_PORT']}").tap do |client|
+        XMLRPC::Client.new2("http://backend_svc:#{ENV['RPC_SERVER_PORT']}").tap do |client|
           client.http.read_timeout = self.default_read_timeout
         end
       end
 
       # コマンドライン実行
-      # @param command_line [String] コマンドライン
-      def exec_command(command_line)
-        create_default_client.call("exec_command", command_line)
-      end
-
-      # コマンドライン実行(拡張版)
-      # @param command_line [String] コマンドライン
-      def exec_command2(command_line)
-        YAML.load create_default_client.call("exec_command2", command_line)
+      # @param route      [String] ルーティング文字列
+      # @param input_data [String] 受け渡す入力データ
+      def exec_command(route, input_data)
+        JSON.parse create_default_client.call("exec_command", route, input_data)
       end
     end
   end

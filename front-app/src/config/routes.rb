@@ -7,12 +7,12 @@ Rails.application.routes.draw do
 
   get '/', to: 'root#index'
 
-  get 'api/list', to: 'api#list'
-  get 'api/create', to: 'api#create'
-  get 'api/detail', to: 'api#detail'
-  put 'api/edit', to: 'api#edit'
-  put 'api/finish', to: 'api#finish'
-  put 'api/delete', to: 'api#delete'
+  get  'api/list',   to: 'api#list'
+  post 'api/create', to: 'api#create'
+  get  'api/detail', to: 'api#detail'
+  post 'api/edit',   to: 'api#edit'
+  post 'api/finish', to: 'api#finish'
+  post 'api/delete', to: 'api#delete'
 
   # どこにも当てはまらない場合
   get '*path', to: 'application#render_404'

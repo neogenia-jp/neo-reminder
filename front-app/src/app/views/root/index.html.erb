@@ -1,4 +1,21 @@
+<div>
+  <a href="?route=yamamoto">yamamoto</a>
+  <a href="?route=yoneoka">yoneoka</a>
+  <a href="?route=kamada">kamada</a>
+  <a href="?route=moriguchi">moriguchi</a>
+  <a href="?route=maeda">maeda</a>
+</div>
+
+<hr />
+
 <div id="vue-area">
+  <!-- 新規登録フォーム -->
+  <form v-on:submit.prevent="onCreate">
+    <input type="text" v-model="input_text" place-holder="TODO アイテムを入力"></input>
+    <input type="submit"></input>
+  </form>
+
+  <!-- 登録済みデータ一覧 -->
   <p v-if="loading">Loading...</p>
 
   <template v-else>
@@ -10,9 +27,50 @@
 </div>
 
 <script type="text/javascript">
+  function callApiCreate(vm) {
+    $.ajax({
+      type: "POST",
+      url: '/api/create',
+      data: {
+        command: 'create',
+        options: {
+          title: vm.input_text
+        }
+      },
+      success: function (response) {
+        let output = JSON.parse(response.output);
+        console.log(output);
+        vm.input_text = '';
+        //that.sending = false;
+        setTimeout(function(){ callApiList(vm); }, 100);
+      },
+      error: function () {
+        //that.sending = false;
+        alert("エラーが発生しました。");
+      }
+    });
+  }
+
+  function callApiList(vm) {
+    $.ajax({
+      type: "GET",
+      url: '/api/list',
+      success: function (response) {
+        let output = JSON.parse(response.output);
+        console.log(output);
+        vm.list = output.list;
+        vm.loading = false;
+      },
+      error: function () {
+        alert("エラーが発生しました。");
+      }
+    });
+  }
+
   var vm = new Vue({
     el: '#vue-area',
     data: {
+      input_text: '',
       loading: true,
       list: []    // view model
     },
@@ -21,38 +79,10 @@
     },
     methods: {
       fetchData: function() {
-        var that = this;
-
-        $.ajax({
-          type: "GET",
-          url: '/api/list',
-          success: function (response) {
-            that.list = response;
-            that.loading = false;
-          },
-          error: function () {
-            alert("エラーが発生しました。時間をおいてページを更新してください。");
-          }
-        });
+        callApiList(this);
       },
-      postData: function() {
-        //if (!confirm("データを更新します。よろしいですか？")) return;
-
-        this.sending = true;
-        var that = this;
-        $.ajax({
-          type: "POST",
-          url: '/api/create',
-          data: this.$data,
-          success: function () {
-            //that.sending = false;
-            //setTimeout(function(){alert("データが更新されました。")}, 100);
-          },
-          error: function () {
-            //that.sending = false;
-            setTimeout(function(){alert("エラーが発生しました。時間をおいてもう一度お試しください。")}, 100);
-          }
-        });
+      onCreate: function() {
+        callApiCreate(this);
       }
     }
   });

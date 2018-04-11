@@ -16,9 +16,10 @@ ENV LC_ALL ja_JP.UTF-8
 ENV TERM=xterm
 
 #####################################################
-# install gdb, sshd
+# install gdb, sshd, any more
 RUN apt-get update \
-    && apt-get install -y gdb openssh-server
+    && apt-get install -y gdb openssh-server \
+    moreutils
 
 # add user
 RUN useradd neo -m -s /bin/bash \
