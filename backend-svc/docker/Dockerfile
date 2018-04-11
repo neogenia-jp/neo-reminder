@@ -24,7 +24,8 @@ RUN apt-get update \
 RUN apt-get install -y \
   libboost-dev \
   libsqlite3-dev \
-  libvsqlitepp-dev
+  libvsqlitepp-dev \
+  sqlite3
 
 # add user
 RUN useradd neo -m -s /bin/bash \
