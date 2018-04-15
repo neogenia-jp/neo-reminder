@@ -5,13 +5,19 @@
 #include <sqlite/query.hpp>
 #include <stdarg.h>
 #include <boost/algorithm/string/join.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
 #include "main.h"
 
 using namespace std;
 
+// 処理結果ステータスコード
+#define _SUCCESS	0	// 正常
+#define _ERROR		1	// 異常
+
+
 struct base_model {
     int id = 0;  //  1,
-    virtual void save_or_update(sqlite::connection* conn) {
+    virtual int save_or_update(sqlite::connection* conn) {
         if (id == 0) {
             save(conn);
         }
@@ -19,7 +25,7 @@ struct base_model {
             update(conn);
         }
     }
-    virtual void save(sqlite::connection* conn) = 0;
+    virtual int save(sqlite::connection* conn) = 0;
     virtual void update(sqlite::connection* conn) = 0;
 };
 
@@ -31,7 +37,7 @@ struct reminder_element : base_model {
     string finished_at; // “2018-03-20T19:32:00+0900”,  // 完了日
     string created_at; // “2018-03-20T19:32:00+0900”  // 作成日
 
-    template<class... A> static std::vector<reminder_element> salect_all(sqlite::connection* conn, A... args) {
+    template<class... A> static std::vector<reminder_element> select_all(sqlite::connection* conn, A... args) {
         std::vector<string> v = { "1=1" };
 
         for (auto i : std::initializer_list<const char*>{ args... }) {
@@ -67,15 +73,28 @@ struct reminder_element : base_model {
         created_at = result->get_string(6);
     }
 
-    void save(sqlite::connection* conn) {
-        // INSERT SQL を作る
-        auto sql = "INSERT INTO reminder_element VALUES (?, ?, ?, ?, ?, ?, ?)";
-            // SQL を実行する
-       sqlite::execute ins(*conn, sql);
+	/*
+	* @brief DBへの登録
+	* @param (conn) DB Connection オブジェクト
+	* @return 0:登録成功
+	* @return 1:登録エラー
+	*/
+    int save(sqlite::connection* conn) {
+		try {
+			// INSERT SQL を作る
+			auto sql = "INSERT INTO reminder_element VALUES (?, ?, ?, ?, ?, ?, ?)";
+			// SQL を実行する
+			sqlite::execute ins(*conn, sql);
 
-       ins % sqlite::nil % title % notify_datetime % term % memo % finished_at % created_at;
-       ins();
-    }
+			ins % sqlite::nil % title % notify_datetime % term % memo % finished_at % created_at;
+			ins();
+		}
+		catch (std::exception const & e) {
+			// TODO:エラーログ出力
+			return 1;
+		}
+		return 0;
+	}
 
     void update(sqlite::connection* conn) {
         // INSERT SQL を作る
@@ -110,7 +129,7 @@ void f_GetList(
 	picojson::object&	result
 )
 {
-    auto list = reminder_element::salect_all(conn, "1=1");
+    auto list = reminder_element::select_all(conn, "1=1");
 
     picojson::array arr;
     for (auto i = list.begin(); i != list.end(); i++) {
@@ -134,13 +153,40 @@ void f_GetList(
 // 登録
 void f_Regist(
     sqlite::connection* conn,
-	picojson::object&	req,
+	picojson::object&	req,	
 	picojson::object&	result
 ) {
     reminder_element elem;
-    elem.title = req["options"].get<picojson::object>()["title"].get<string>();
 
-    elem.save_or_update(conn);
+	// 登録データ取得 
+	elem.title			 = req["options"].get<picojson::object>()["title"].get<string>();
+	//elem.notify_datetime = req["options"].get<picojson::object>()["notify_datetime"].get<string>();
+	//elem.term			 = req["options"].get<picojson::object>()["term"].get<string>();
+	elem.memo			 = req["options"].get<picojson::object>()["memo"].get<string>();
+	//elem.finished_at	 = req["options"].get<picojson::object>()["finished_at"].get<string>();
+	time_t now = std::time(nullptr);
+	const tm* lt = localtime(&now);
+	char buf[128];
+	strftime(buf, sizeof(buf), "%Y/%m/%d %H:%M:%S", lt);
+	elem.created_at = buf;
+		
+	// DB登録
+	int resultDB = elem.save_or_update(conn);
+
+	// 結果送信
+	picojson::object obj1;
+	string status, message;
+	if (resultDB == _SUCCESS) {
+		status = "ok";
+		message = "登録完了";
+	}
+	else {
+		status = "error";
+		message = "登録失敗";
+	}
+	obj1.insert(std::make_pair("status", picojson::value(status)));
+	obj1.insert(std::make_pair("message", picojson::value(message)));
+	result = obj1;
 }
 
 // 詳細表示
@@ -154,18 +200,21 @@ void f_DspDetail(
 
 // 詳細編集
 void f_EditDetail(
+	sqlite::connection* conn,
 	picojson::object&	req,
 	picojson::object&	result
 ) {}
 
 // 完了
 void f_Finish(
+	sqlite::connection* conn,
 	picojson::object&	req,
 	picojson::object&	result
 ) {}
 
 // 削除
 void f_Delete(
+	sqlite::connection* conn,
 	picojson::object&	req,
 	picojson::object&	result
 ) {}
@@ -182,10 +231,6 @@ void test(sqlite::connection* conn) {
 int main(int argc, const char *args[])
 {
     auto conn = init_db();
-
-    //test(conn);
-
-
 
     auto filepath = "/dev/stdin";
 
@@ -217,7 +262,6 @@ int main(int argc, const char *args[])
 	// 受け取ったコマンドによる処理
 	switch (commandMap[command]) {
 	case CommandType::list:
-		// オプション取得
 		f_GetList(conn, obj, result);
 		break;
 	case CommandType::create:
@@ -227,13 +271,13 @@ int main(int argc, const char *args[])
 		f_DspDetail(conn, obj, result);
 		break; 
 	case CommandType::edit:
-		f_EditDetail(obj, result);
+		f_EditDetail(conn, obj, result);
 		break;
 	case CommandType::finish:
-		f_Finish(obj, result);
+		f_Finish(conn, obj, result);
 		break;
 	case CommandType::delet:
-		f_Delete(obj, result);
+		f_Delete(conn, obj, result);
 		break;
 	default:
 		break;
