@@ -26,7 +26,7 @@ struct base_model {
         }
     }
     virtual int save(sqlite::connection* conn) = 0;
-    virtual void update(sqlite::connection* conn) = 0;
+    virtual int update(sqlite::connection* conn) = 0;
 };
 
 struct reminder_element : base_model {
@@ -74,7 +74,7 @@ struct reminder_element : base_model {
     }
 
 	/*
-	* @brief DBへの登録
+	* @brief データ新規登録
 	* @param (conn) DB Connection オブジェクト
 	* @return 0:登録成功
 	* @return 1:登録エラー
@@ -96,14 +96,27 @@ struct reminder_element : base_model {
 		return 0;
 	}
 
-    void update(sqlite::connection* conn) {
-        // INSERT SQL を作る
-        auto sql = "UPDATE reminder_element SET title=?, notify_datetime=?, term=?, memo=?, finished_at=?, created_at=? WHERE id=?";
+	/*
+	* @brief データ更新
+	* @param (conn) DB Connection オブジェクト
+	* @return 0:登録成功
+	* @return 1:登録エラー
+	*/
+    int update(sqlite::connection* conn) {
+        try {
+            // INSERT SQL を作る
+            auto sql = "UPDATE reminder_element SET title=?, notify_datetime=?, term=?, memo=?, finished_at=?, created_at=? WHERE id=?";
             // SQL を実行する
-       sqlite::execute upd(*conn, sql);
+            sqlite::execute upd(*conn, sql);
 
-       upd % title % notify_datetime % term % memo % finished_at % created_at % id;
-       upd();
+            upd % title % notify_datetime % term % memo % finished_at % created_at % id;
+            upd();
+        }
+        catch (std::exception const & e) {
+            // TODO:エラーログ出力
+            return 1;
+        }
+        return 0;
     }
 };
 
@@ -150,6 +163,20 @@ void f_GetList(
     result.insert(std::make_pair("list", picojson::value(arr)));
 }
 
+//TODO:ISO形式に修正
+/*
+* @brief 現在日時取得
+* @return string 現在日時
+*/
+string f_GetTime()
+{
+    time_t now = std::time(nullptr);
+    const tm* lt = localtime(&now);
+    char buf[128];
+    strftime(buf, sizeof(buf), "%Y/%m/%d %H:%M:%S", lt);
+    return buf;
+}
+
 // 登録
 void f_Regist(
     sqlite::connection* conn,
@@ -164,11 +191,7 @@ void f_Regist(
 	//elem.term			 = req["options"].get<picojson::object>()["term"].get<string>();
 	elem.memo			 = req["options"].get<picojson::object>()["memo"].get<string>();
 	//elem.finished_at	 = req["options"].get<picojson::object>()["finished_at"].get<string>();
-	time_t now = std::time(nullptr);
-	const tm* lt = localtime(&now);
-	char buf[128];
-	strftime(buf, sizeof(buf), "%Y/%m/%d %H:%M:%S", lt);
-	elem.created_at = buf;
+    elem.created_at = f_GetTime();
 		
 	// DB登録
 	int resultDB = elem.save_or_update(conn);
@@ -189,6 +212,8 @@ void f_Regist(
 	result = obj1;
 }
 
+
+
 // 詳細表示
 void f_DspDetail(
     sqlite::connection* conn,
@@ -203,7 +228,39 @@ void f_EditDetail(
 	sqlite::connection* conn,
 	picojson::object&	req,
 	picojson::object&	result
-) {}
+) {
+    reminder_element elem;
+
+    // 編集データ取得 
+    elem.id                 = stoi(req["options"].get<picojson::object>()["id"].get<string>());
+    elem.title              = req["options"].get<picojson::object>()["title"].get<string>();
+    elem.notify_datetime    = req["options"].get<picojson::object>()["notify_datetime"].get<string>();
+    elem.term			    = req["options"].get<picojson::object>()["term"].get<string>();
+    elem.memo               = req["options"].get<picojson::object>()["memo"].get<string>();
+    //elem.finished_at	    = req["options"].get<picojson::object>()["finished_at"].get<string>();
+    elem.created_at         = f_GetTime();
+
+    // DB登録
+    int resultDB = elem.save_or_update(conn);
+
+    // 結果送信
+    picojson::object obj1;
+    string status, message;
+    if (resultDB == _SUCCESS) {
+        status = "ok";
+        message = "更新完了";
+    }
+    else {
+        status = "error";
+        message = "更新失敗";
+    }
+    obj1.insert(std::make_pair("status", picojson::value(status)));
+    obj1.insert(std::make_pair("message", picojson::value(message)));
+    // TODO:とりあえず失敗でも作成日出力
+    obj1.insert(std::make_pair("created_at", picojson::value(elem.created_at)));
+    
+    result = obj1;
+}
 
 // 完了
 void f_Finish(
