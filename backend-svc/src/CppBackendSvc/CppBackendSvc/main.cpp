@@ -118,6 +118,29 @@ struct reminder_element : base_model {
         }
         return 0;
     }
+
+    /*
+    * @brief データ完了更新
+    * @param (conn) DB Connection オブジェクト
+    * @return 0:更新成功
+    * @return 1:更新エラー
+    */
+    int finish(sqlite::connection* conn) {
+        try {
+            // INSERT SQL を作る
+            auto sql = "UPDATE reminder_element SET finished_at=? WHERE id=?";
+            // SQL を実行する
+            sqlite::execute upd(*conn, sql);
+
+            upd % finished_at % id;
+            upd();
+        }
+        catch (std::exception const & e) {
+            // TODO:エラーログ出力
+            return 1;
+        }
+        return 0;
+    }
 };
 
 sqlite::connection* init_db() {
@@ -267,7 +290,34 @@ void f_Finish(
 	sqlite::connection* conn,
 	picojson::object&	req,
 	picojson::object&	result
-) {}
+) {
+    reminder_element elem;
+
+    // 完了データ取得
+    elem.id = stoi(req["options"].get<picojson::object>()["id"].get<string>());
+    elem.finished_at = f_GetTime();
+
+    // DB登録
+    int resultDB = elem.finish(conn);
+
+    // 結果送信
+    picojson::object obj1;
+    string status, message;
+    if (resultDB == _SUCCESS) {
+        status = "ok";
+        message = "更新完了";
+    }
+    else {
+        status = "error";
+        message = "更新失敗";
+    }
+    obj1.insert(std::make_pair("status", picojson::value(status)));
+    obj1.insert(std::make_pair("message", picojson::value(message)));
+    // TODO:とりあえず失敗でも完了日出力
+    obj1.insert(std::make_pair("finished_at", picojson::value(elem.finished_at)));
+
+    result = obj1;
+}
 
 // 削除
 void f_Delete(
