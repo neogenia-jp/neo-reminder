@@ -141,6 +141,29 @@ struct reminder_element : base_model {
         }
         return 0;
     }
+
+    /*
+    * @brief データ削除
+    * @param (conn) DB Connection オブジェクト
+    * @return 0:削除成功
+    * @return 1:削除エラー
+    */
+    int dataDelete(sqlite::connection* conn) {
+        try {
+            // INSERT SQL を作る
+            auto sql = "DELETE FROM reminder_element WHERE id=?";
+            // SQL を実行する
+            sqlite::execute del(*conn, sql);
+
+            del % id;
+            del();
+        }
+        catch (std::exception const & e) {
+            // TODO:エラーログ出力
+            return 1;
+        }
+        return 0;
+    }
 };
 
 sqlite::connection* init_db() {
@@ -324,7 +347,31 @@ void f_Delete(
 	sqlite::connection* conn,
 	picojson::object&	req,
 	picojson::object&	result
-) {}
+) {
+    reminder_element elem;
+
+    // 完了データ取得
+    elem.id = stoi(req["options"].get<picojson::object>()["id"].get<string>());
+
+    // DB登録
+    int resultDB = elem.dataDelete(conn);
+
+    // 結果送信
+    picojson::object obj1;
+    string status, message;
+    if (resultDB == _SUCCESS) {
+        status = "ok";
+        message = "削除完了";
+    }
+    else {
+        status = "error";
+        message = "削除失敗";
+    }
+    obj1.insert(std::make_pair("status", picojson::value(status)));
+    obj1.insert(std::make_pair("message", picojson::value(message)));
+    
+    result = obj1;
+}
 
 void test(sqlite::connection* conn) {
     reminder_element elem;
