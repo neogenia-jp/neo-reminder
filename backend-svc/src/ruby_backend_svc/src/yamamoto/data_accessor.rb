@@ -30,8 +30,12 @@ module Yamamoto
     # @param id [Integer] ファイルID（指定しない場合は次のIDを採番する）
     # @return [Integer] 書き込んだバイト数
     def create(contents, id=nil)
-      # TODO: ファイルの存在確認
+      # IDがファイル名と二重管理になるため、消しておく
+      contents.delete_if {|key, val| key == :id || key == 'id'}
+
       id = next_id unless id
+
+      # TODO: ファイルの存在確認
       File.write(File.join(@data_base_path, "#{id}.json"), contents.to_json)
     end
 
