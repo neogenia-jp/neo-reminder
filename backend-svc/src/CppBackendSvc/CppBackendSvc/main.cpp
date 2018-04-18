@@ -287,6 +287,8 @@ void f_DspDetail(
 ) {
     reminder_element elem;
 
+    elem.id = stoi(req["options"].get<picojson::object>()["id"].get<string>());
+
     // 詳細データ取得
     elem.select(conn);
 
