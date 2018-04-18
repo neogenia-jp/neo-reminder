@@ -9,7 +9,7 @@ Rails.application.routes.draw do
 
   get  'api/list',   to: 'api#list'
   post 'api/create', to: 'api#create'
-  get  'api/detail', to: 'api#detail'
+  get  'api/detail/:id', to: 'api#detail'
   post 'api/edit',   to: 'api#edit'
   post 'api/finish', to: 'api#finish'
   post 'api/delete', to: 'api#delete'

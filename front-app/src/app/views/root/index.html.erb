@@ -1,3 +1,4 @@
+<div class="container" style="max-width: 480px">
 <div>
   <a href="?route=yamamoto">yamamoto</a>
   <a href="?route=yoneoka">yoneoka</a>
@@ -11,19 +12,78 @@
 <div id="vue-area">
   <!-- 新規登録フォーム -->
   <form v-on:submit.prevent="onCreate">
-    <input type="text" v-model="input_text" place-holder="TODO アイテムを入力"></input>
-    <input type="submit"></input>
+    <div class="input-group">
+      <input class="form-control" type="text" v-model="input_text" placeholder="TODO アイテムを入力"></input>
+      <span class="input-group-btn">
+        <input class="btn btn-primary" type="submit"></input>
+      </span>
+    </div>
   </form>
+
+  <p></p>
 
   <!-- 登録済みデータ一覧 -->
   <p v-if="loading">Loading...</p>
 
   <template v-else>
-    <div v-for="element in list" class="reminder-list">
-      <input type="text" v-model="element.title"></input>
-      <span>{{ element.term }}<span>
-    </div>
+    <ul class="list-group">
+      <li class="list-group-item" v-for="element in list">
+          <div  v-on:click="onClickDetail(element.id)" class="reminder-element">
+            <span type="text">{{ element.title }}</span>
+            (<span>{{ element.term }}<span>)
+          </div>
+      </li>
+    </ul>
   </template>
+</div>
+
+<div id="element_details" class="modal fade">
+  <div class="modal-dialog">
+    <div class="modal-content" id="vue-modal-area">
+      <div class="modal-header" style="border-bottom: 1px solid #d8d8d8;">
+        <p v-if="loading">Loading...</p>
+        <h3 v-else>{{ element.title }}</h3>
+      </div>
+      <div class="modal-body">
+        <form>
+          <div class="form-group">
+          </div>
+          <div class="form-group">
+            <label>タイトル</label>
+            <input class="form-control" v-model="element.title" placeholder="必須">
+          </div>
+          <div class="form-group">
+            <label>通知日時</label>
+            <input class="form-control" v-model="element.notify_datetime" placeholder="ISO形式" type="datatime">
+          </div>
+          <div class="form-group">
+            <label>期限</label>
+            <input class="form-control" v-model="element.term" placeholder="ISO形式">
+          </div>
+          <div class="form-group">
+            <label>メモ</label>
+            <input class="form-control" v-model="element.memo" placeholder="メモを入力できます。">
+          </div>
+          <div class="form-group">
+            <label>完了日時</label>
+            <input class="form-control" v-model="element.finished_at" placeholder="ISO形式">
+          </div>
+          <div class="form-group">
+            <label>作成日時</label>
+            <input class="form-control" v-model="element.created_at" placeholder="ISO形式">
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer" style="border-top: 1px solid #d8d8d8;">
+        <p class="pull-left">
+          ID: {{ element.id }}
+        </p>
+        <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+        <button type="button" class="btn btn-primary" v-on:click="onClickSave">反映</button>
+      </div>
+    </div>
+  </div>
+</div>
 </div>
 
 <script type="text/javascript">
@@ -67,6 +127,45 @@
     });
   }
 
+  function callApiDetail(vm, id) {
+    $.ajax({
+      type: "GET",
+      url: '/api/detail/'+id,
+      success: function (response) {
+        let output = JSON.parse(response.output);
+        console.log(output);
+        vm.element = output;
+        vm.loading = false;
+      },
+      error: function () {
+        alert("エラーが発生しました。");
+      }
+    });
+  }
+
+  function callApiEdit(vm2) {
+    $.ajax({
+      type: "POST",
+      url: '/api/edit',
+      data: vm2.element,
+      success: function (response) {
+        let output = JSON.parse(response.output);
+        console.log(output);
+        setTimeout(function(){ callApiList(vm); }, 100);
+        $('#element_details').modal('hide');
+        reload();
+      },
+      error: function () {
+        //that.sending = false;
+        alert("エラーが発生しました。");
+      }
+    });
+  }
+
+  function reload(){
+    vm.reload();
+  }
+
   var vm = new Vue({
     el: '#vue-area',
     data: {
@@ -82,7 +181,32 @@
         callApiList(this);
       },
       onCreate: function() {
+        reload();
+      },
+      reload: function() {
         callApiCreate(this);
+      },
+      onClickDetail: function(id) {
+        vm2.load(id);
+      }
+    }
+  });
+
+  var vm2 = new Vue({
+    el: '#vue-modal-area',
+    data: {
+      element: {},  // view model
+      loading: true,
+    },
+    created: function() {
+    },
+    methods: {
+      load: function(id) {
+        callApiDetail(this);
+        $('#element_details').modal('show');
+      },
+      onClickSave: function() {
+        callApiEdit(this);
       }
     }
   });
