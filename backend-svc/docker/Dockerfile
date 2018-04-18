@@ -31,6 +31,9 @@ RUN apt-get install -y \
 RUN useradd neo -m -s /bin/bash \
  && echo 'neo:neo' | chpasswd
 
+# Gem install
+RUN gem install --no-document pry-byebug
+
 #####################################################
 # add scripts
 ADD resources/docker-entrypoint.sh /
