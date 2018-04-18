@@ -105,7 +105,7 @@ struct reminder_element : base_model {
 			// SQL を実行する
 			sqlite::execute ins(*conn, sql);
 
-			ins % sqlite::nil % title % notify_datetime % term % memo % finished_at % created_at;
+			ins % sqlite::nil % title % sqlite::nil % sqlite::nil % sqlite::nil % sqlite::nil % created_at;
 			ins();
 		}
 		catch (std::exception const & e) {
@@ -228,17 +228,16 @@ void f_GetList(
     result.insert(std::make_pair("list", picojson::value(arr)));
 }
 
-//TODO:ISO形式に修正
 /*
 * @brief 現在日時取得
-* @return string 現在日時
+* @return (buf) string 現在日時
 */
 string f_GetTime()
 {
     time_t now = std::time(nullptr);
     const tm* lt = localtime(&now);
     char buf[128];
-    strftime(buf, sizeof(buf), "%Y/%m/%d %H:%M:%S", lt);
+    strftime(buf, sizeof(buf), "%FT%T+0900", lt);
     return buf;
 }
 
@@ -251,11 +250,7 @@ void f_Regist(
     reminder_element elem;
 
 	// 登録データ取得 
-	elem.title			 = req["options"].get<picojson::object>()["title"].get<string>();
-	//elem.notify_datetime = req["options"].get<picojson::object>()["notify_datetime"].get<string>();
-	//elem.term			 = req["options"].get<picojson::object>()["term"].get<string>();
-	elem.memo			 = req["options"].get<picojson::object>()["memo"].get<string>();
-	//elem.finished_at	 = req["options"].get<picojson::object>()["finished_at"].get<string>();
+	elem.title = req["options"].get<picojson::object>()["title"].get<string>();
     elem.created_at = f_GetTime();
 		
 	// DB登録
@@ -319,7 +314,6 @@ void f_EditDetail(
     elem.notify_datetime    = req["options"].get<picojson::object>()["notify_datetime"].get<string>();
     elem.term			    = req["options"].get<picojson::object>()["term"].get<string>();
     elem.memo               = req["options"].get<picojson::object>()["memo"].get<string>();
-    //elem.finished_at	    = req["options"].get<picojson::object>()["finished_at"].get<string>();
     elem.created_at         = f_GetTime();
 
     // DB登録
@@ -416,7 +410,6 @@ void test(sqlite::connection* conn) {
 
     elem.save_or_update(conn);
 }
-
 
 int main(int argc, const char *args[])
 {
