@@ -35,6 +35,13 @@ module Yamamoto
       File.write(File.join(@data_base_path, "#{id}.json"), contents.to_json)
     end
 
+    # 削除
+    # @param id [Integer] ファイルID
+    def delete(id)
+      # TODO: ファイルの存在確認
+      File.delete(File.join(@data_base_path, "#{id}.json"))
+    end
+
     # 次のID
     # @return [Integer] 次のID
     def next_id
