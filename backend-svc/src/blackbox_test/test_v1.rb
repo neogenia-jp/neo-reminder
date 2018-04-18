@@ -162,7 +162,7 @@ class TestV1 < Test::Unit::TestCase
   end
 
   def is_iso_date(iso_date)
-    true
+    iso_date =~ /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\+\d\d\d\d/
   end
 end
 
