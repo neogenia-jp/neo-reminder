@@ -101,11 +101,11 @@ struct reminder_element : base_model {
     int save(sqlite::connection* conn) {
 		try {
 			// INSERT SQL を作る
-			auto sql = "INSERT INTO reminder_element VALUES (?, ?, ?, ?, ?, ?, ?)";
+			auto sql = "INSERT INTO reminder_element VALUES (?, ?, ?, ?, ?, ?, ?)" ;
 			// SQL を実行する
 			sqlite::execute ins(*conn, sql);
 
-			ins % sqlite::nil % title % sqlite::nil % sqlite::nil % sqlite::nil % sqlite::nil % created_at;
+			ins % sqlite::nil % title % notify_datetime % term % memo % finished_at % created_at;
 			ins();
 		}
 		catch (std::exception const & e) {
