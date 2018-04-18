@@ -69,8 +69,8 @@ class TestV1 < Test::Unit::TestCase
       options: {
         id:              entity_id,
         title:           'テストコードを書く',
-        notify_datetime: '2018-03-20T17:00:00+0900',
-        term:            '2018-03-21T10:30:00+0900',
+        notify_datetime: '2018-03-20T17:00:00+09:00',
+        term:            '2018-03-21T10:30:00+09:00',
         memo:            '実装した新機能のテストコードがまだないので書く'
       }
     }
@@ -86,7 +86,7 @@ class TestV1 < Test::Unit::TestCase
     assert_equal 2, result[:list].length
     assert_equal entity_id, result[:list][0][:id]  # IDは変わってないこと
     assert_equal 'テストコードを書く', result[:list][0][:title]
-    assert_equal '2018-03-21T10:30:00+0900', result[:list][0][:term]
+    assert_equal '2018-03-21T10:30:00+09:00', result[:list][0][:term]
     assert_equal '打ち上げに行く', result[:list][1][:title]
     assert result[:list][1][:term] == nil || result[:list][1][:term] == ''
 
@@ -102,8 +102,8 @@ class TestV1 < Test::Unit::TestCase
 
     assert_equal entity_id, result[:id]  # IDは変わってないこと
     assert_equal 'テストコードを書く', result[:title]
-    assert_equal '2018-03-20T17:00:00+0900', result[:notify_datetime]
-    assert_equal '2018-03-21T10:30:00+0900', result[:term]
+    assert_equal '2018-03-20T17:00:00+09:00', result[:notify_datetime]
+    assert_equal '2018-03-21T10:30:00+09:00', result[:term]
     assert_equal '実装した新機能のテストコードがまだないので書く', result[:memo]
     assert result[:finished_at] == nil || result[:finished_at] == ''
     assert is_iso_date(result[:created_at])
@@ -128,8 +128,8 @@ class TestV1 < Test::Unit::TestCase
 
     assert_equal entity_id, result[:id]  # IDは変わってないこと
     assert_equal 'テストコードを書く', result[:title]
-    assert_equal '2018-03-20T17:00:00+0900', result[:notify_datetime]
-    assert_equal '2018-03-21T10:30:00+0900', result[:term]
+    assert_equal '2018-03-20T17:00:00+09:00', result[:notify_datetime]
+    assert_equal '2018-03-21T10:30:00+09:00', result[:term]
     assert_equal '実装した新機能のテストコードがまだないので書く', result[:memo]
     assert is_iso_date(result[:finished_at])
     assert_equal entity1_created_at, result[:created_at]
@@ -162,7 +162,7 @@ class TestV1 < Test::Unit::TestCase
   end
 
   def is_iso_date(iso_date)
-    iso_date =~ /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\+\d\d\d\d/
+    iso_date =~ /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\+\d\d:\d\d/
   end
 end
 
