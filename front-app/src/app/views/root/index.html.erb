@@ -29,7 +29,7 @@
     <ul class="list-group">
       <li class="list-group-item" v-for="element in list">
           <div  v-on:click="onClickDetail(element.id)" class="reminder-element">
-            <span type="text" v-model="element.title"></span>
+            <span type="text">{{ element.title }}</span>
             (<span>{{ element.term }}<span>)
           </div>
       </li>
