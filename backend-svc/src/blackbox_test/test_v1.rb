@@ -110,7 +110,7 @@ class TestV1 < Test::Unit::TestCase
     entity1_created_at = result[:created_at]
 
     # 完了
-    json_data = %Q/{"command":"finish","options":{"id":#{entity_id}}}'/
+    json_data = %Q/{"command":"finish","options":{"id":#{entity_id}}}/
     result = _call_svc(json_data)
 
     assert_equal 'ok', result[:status]
