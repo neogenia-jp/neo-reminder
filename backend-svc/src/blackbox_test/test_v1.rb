@@ -26,7 +26,8 @@ class TestV1 < Test::Unit::TestCase
     end
 
     assert_not_equal '', result, 'No response of service!!!'
-    JSON.parse result
+
+    JSON.parse(result, symbolize_names: true)
   end
 
   def test_scenario
