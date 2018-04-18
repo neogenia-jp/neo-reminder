@@ -56,4 +56,5 @@ services:
       - seccomp:unconfined
     environment:
       RPC_SERVER_PORT     :
+      TEST                :
 
