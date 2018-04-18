@@ -9,7 +9,7 @@ class TestV1 < Test::Unit::TestCase
 
   def _call_svc(json)
     if json.is_a? Hash
-      json = JSON.to_json json
+      json = json.to_json
     end
 
     begin
@@ -64,7 +64,7 @@ class TestV1 < Test::Unit::TestCase
     entity_id = result[:list][0][:id]
 
     # 編集
-    json = {
+    json_data = {
       command: :edit,
       options: {
         id:              entity_id,
@@ -163,5 +163,8 @@ class TestV1 < Test::Unit::TestCase
     assert_equal 0, result[:list].length
   end
 
+  def is_iso_date(iso_date)
+    true
+  end
 end
 
