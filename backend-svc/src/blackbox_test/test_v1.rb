@@ -9,7 +9,7 @@ class TestV1 < Test::Unit::TestCase
 
   def _call_svc(json)
     if json.is_a? Hash
-      json = JSON.to_json json
+      json = json.to_json
     end
 
     begin
@@ -64,7 +64,7 @@ class TestV1 < Test::Unit::TestCase
     entity_id = result[:list][0][:id]
 
     # 編集
-    json = {
+    json_data = {
       command: :edit,
       options: {
         id:              entity_id,
@@ -100,18 +100,17 @@ class TestV1 < Test::Unit::TestCase
 
     result = _call_svc(json_data)
 
-    assert_equal entity_id, result[:id]
-    assert_equal entity_id, result[:list][0][:id]  # IDは変わってないこと
-    assert_equal 'テストコードを書く', result[:list][0][:title]
-    assert_equal '2018-03-20T17:00:00+0900', result[:list][0][:notify_datetime]
-    assert_equal '2018-03-21T10:30:00+0900', result[:list][0][:term]
-    assert_equal '実装した新機能のテストコードがまだないので書く', result[:list][0][:memo]
+    assert_equal entity_id, result[:id]  # IDは変わってないこと
+    assert_equal 'テストコードを書く', result[:title]
+    assert_equal '2018-03-20T17:00:00+0900', result[:notify_datetime]
+    assert_equal '2018-03-21T10:30:00+0900', result[:term]
+    assert_equal '実装した新機能のテストコードがまだないので書く', result[:memo]
     assert result[:finished_at] == nil || result[:finished_at] == ''
     assert is_iso_date(result[:created_at])
     entity1_created_at = result[:created_at]
 
     # 完了
-    json_data = %Q/{"command":"finish","options":{"id":#{entity_id}}}'/
+    json_data = %Q/{"command":"finish","options":{"id":#{entity_id}}}/
     result = _call_svc(json_data)
 
     assert_equal 'ok', result[:status]
@@ -127,12 +126,11 @@ class TestV1 < Test::Unit::TestCase
 
     result = _call_svc(json_data)
 
-    assert_equal entity_id, result[:id]
-    assert_equal entity_id, result[:list][0][:id]  # IDは変わってないこと
-    assert_equal 'テストコードを書く', result[:list][0][:title]
-    assert_equal '2018-03-20T17:00:00+0900', result[:list][0][:notify_datetime]
-    assert_equal '2018-03-21T10:30:00+0900', result[:list][0][:term]
-    assert_equal '実装した新機能のテストコードがまだないので書く', result[:list][0][:memo]
+    assert_equal entity_id, result[:id]  # IDは変わってないこと
+    assert_equal 'テストコードを書く', result[:title]
+    assert_equal '2018-03-20T17:00:00+0900', result[:notify_datetime]
+    assert_equal '2018-03-21T10:30:00+0900', result[:term]
+    assert_equal '実装した新機能のテストコードがまだないので書く', result[:memo]
     assert is_iso_date(result[:finished_at])
     assert_equal entity1_created_at, result[:created_at]
 
@@ -163,5 +161,8 @@ class TestV1 < Test::Unit::TestCase
     assert_equal 0, result[:list].length
   end
 
+  def is_iso_date(iso_date)
+    iso_date =~ /\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d\+\d\d\d\d/
+  end
 end
 
