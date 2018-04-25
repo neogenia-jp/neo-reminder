@@ -38,6 +38,8 @@ struct reminder_element : base_model {
     string created_at; // “2018-03-20T19:32:00+0900”  // 作成日
 
     template<class... A> static std::vector<reminder_element> select_all(sqlite::connection* conn, A... args) {
+        // TODO: all | today | unfinished　の条件追加
+        
         std::vector<string> v = { "1=1" };
 
         for (auto i : std::initializer_list<const char*>{ args... }) {
@@ -270,10 +272,10 @@ void f_Regist(
 	}
 	obj1.insert(std::make_pair("status", picojson::value(status)));
 	obj1.insert(std::make_pair("message", picojson::value(message)));
+    obj1.insert(std::make_pair("created_at", picojson::value(elem.created_at)));
+    
 	result = obj1;
 }
-
-
 
 // 詳細表示
 void f_DspDetail(
