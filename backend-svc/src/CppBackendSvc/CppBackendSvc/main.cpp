@@ -238,7 +238,7 @@ string f_GetTime()
     time_t now = std::time(nullptr);
     const tm* lt = localtime(&now);
     char buf[128];
-    strftime(buf, sizeof(buf), "%FT%T+0900", lt);
+    strftime(buf, sizeof(buf), "%FT%T+09:00", lt);
     return buf;
 }
 
@@ -308,7 +308,7 @@ void f_EditDetail(
     reminder_element elem;
 
     // 編集データ取得 
-    elem.id                 = stoi(req["options"].get<picojson::object>()["id"].get<string>());
+    elem.id                 = (int)req["options"].get<picojson::object>()["id"].get<double>();
     elem.title              = req["options"].get<picojson::object>()["title"].get<string>();
     elem.notify_datetime    = req["options"].get<picojson::object>()["notify_datetime"].get<string>();
     elem.term			    = req["options"].get<picojson::object>()["term"].get<string>();
@@ -346,7 +346,7 @@ void f_Finish(
     reminder_element elem;
 
     // 完了データ取得
-    elem.id = stoi(req["options"].get<picojson::object>()["id"].get<string>());
+    elem.id = (int)req["options"].get<picojson::object>()["id"].get<double>();
     elem.finished_at = f_GetTime();
 
     // DB登録
@@ -380,8 +380,8 @@ void f_Delete(
     reminder_element elem;
 
     // 完了データ取得
-    elem.id = stoi(req["options"].get<picojson::object>()["id"].get<string>());
-
+    elem.id = (int)req["options"].get<picojson::object>()["id"].get<double>();
+    
     // DB登録
     int resultDB = elem.dataDelete(conn);
 
@@ -437,7 +437,8 @@ int main(int argc, const char *args[])
 	// commandを取得
 	picojson::object obj = picoValue.get<picojson::object>();
 	string command = obj["command"].get<string>();
-	//cout << "command is " << command << endl;
+    if (command == "delete") command = "delet";     // 予約語なので変換
+    // TODO:取得コマンドログ出力
 
     picojson::object result;
 
