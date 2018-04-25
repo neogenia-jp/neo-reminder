@@ -11,9 +11,21 @@
 using namespace std;
 
 // 処理結果ステータスコード
+#define _ERROR		-99	// 異常
 #define _SUCCESS	0	// 正常
-#define _ERROR		1	// 異常
 
+
+
+map<string, CommandType> commandMap{
+    { "list" , list },
+    { "create", create },
+    { "detail", detail },
+    { "edit", edit },
+    { "finish", finish },
+    { "delet", delet },
+    { "clear", clear },
+    { "observe", observe },
+};
 
 struct base_model {
     int id = 0;  //  1,
@@ -38,6 +50,8 @@ struct reminder_element : base_model {
     string created_at; // “2018-03-20T19:32:00+0900”  // 作成日
 
     template<class... A> static std::vector<reminder_element> select_all(sqlite::connection* conn, A... args) {
+        // TODO: all | today | unfinished　の条件追加
+        
         std::vector<string> v = { "1=1" };
 
         for (auto i : std::initializer_list<const char*>{ args... }) {
@@ -184,7 +198,79 @@ struct reminder_element : base_model {
         }
         return 0;
     }
+
+    /*
+    * @brief DBからの結果を格納する構造体
+    */
+    struct DataStruct {
+        short                       status;     // 処理結果ステータス
+        short                       message;    // 処理結果メッセージ
+        vector<reminder_element>    data;       // 出力データ
+    };
+
+    /*
+    * @brief データ一括削除
+    * @param (conn) DB Connection オブジェクト
+    * @return 0:削除成功
+    * @return 1:削除エラー
+    */
+    vector<int> clear(sqlite::connection* conn, string option) {
+        // DELETE SQL を作る
+        string deleteSql = "DELETE FROM reminder_element WHERE 1 = 1";
+        vector<int> clearTaget;
+        int status = 0;
+
+        if (option == "finished") {
+            // 削除対象のIDを取得
+            Get_ClearTarget(conn, clearTaget);
+            // DELETE SQL文に条件を追加
+            deleteSql.append(" AND finished_at IS NOT NULL");
+        }
+
+        try {
+            // SQL を実行する
+            sqlite::execute del(*conn, deleteSql);
+            del();
+        }
+        catch (std::exception const & e) {
+            // TODO:エラーログ出力
+            status = -99;
+        }
+        // 先頭にステータスを追加
+        clearTaget.insert(clearTaget.begin(), status);
+
+        return clearTaget;
+    }
+
+    /*
+    * @brief 削除対象ＩＤ取得
+    * @param (conn) DB Connection オブジェクト
+    * @param (&clearTaget) 削除対象ＩＤ格納変数
+    */
+    void Get_ClearTarget(sqlite::connection * conn, std::vector<int> &clearTaget)
+    {
+        // 削除対象となるレコードを調べ,格納する
+        string selectSql = "SELECT id FROM reminder_element WHERE 1 = 1 AND finished_at IS NOT NULL";
+        sqlite::query q(*conn, selectSql);
+        boost::shared_ptr<sqlite::result> result = q.get_result();
+        while (result->next_row()) {
+            clearTaget.push_back(result->get_int(0));
+        }
+    }
+
+    /*
+    * @brief 各種データ取得
+    * @param (conn) DB Connection オブジェクト
+    * @return 0:正常
+    * @return 1:異常
+    */
+    int getObserveData(sqlite::connection* conn) {
+        return 0;
+    }
+
 };
+
+
 
 sqlite::connection* init_db() {
     try {
@@ -270,6 +356,7 @@ void f_Regist(
 	}
 	obj1.insert(std::make_pair("status", picojson::value(status)));
 	obj1.insert(std::make_pair("message", picojson::value(message)));
+    obj1.insert(std::make_pair("created_at", picojson::value(elem.created_at)));
 	result = obj1;
 }
 
@@ -331,8 +418,7 @@ void f_EditDetail(
     }
     obj1.insert(std::make_pair("status", picojson::value(status)));
     obj1.insert(std::make_pair("message", picojson::value(message)));
-    // TODO:とりあえず失敗でも作成日出力
-    obj1.insert(std::make_pair("created_at", picojson::value(elem.created_at)));
+    obj1.insert(std::make_pair("updated_at", picojson::value(elem.created_at)));
     
     result = obj1;
 }
@@ -402,6 +488,53 @@ void f_Delete(
     result = obj1;
 }
 
+// 一括削除
+void f_Clear(
+    sqlite::connection* conn,
+    picojson::object&	req,
+    picojson::object&	result
+){
+    reminder_element elem;
+    // option取得
+    string option = req["options"].get<picojson::object>()["target"].get<string>();
+    //target: “all | finished”   // finished を指定すると、完了したリマインダーだけを削除する
+
+    auto resultDB = elem.clear(conn, option);
+
+    // 結果送信
+    picojson::object obj1;
+    string status, message;
+    if (resultDB[0] == _SUCCESS) {
+        status = "ok";
+        message = "削除完了";
+    }
+    else {
+        status = "error";
+        message = "削除失敗";
+    }
+    obj1.insert(std::make_pair("status", picojson::value(status)));
+    obj1.insert(std::make_pair("message", picojson::value(message)));
+    string clearList;
+/*
+    for (int i = 1; resultDB.size; i++){
+        clearList += result[i];
+    }*/
+
+    // TODO:削除されたIDの列挙
+    // obj1.insert(std::make_pair("affected_id_list", picojson::value(message)));
+    // affected_id_list : [1, 2, …]   // 削除されたIDのリスト
+
+    result = obj1;
+}
+
+void f_GetObserveData(
+    sqlite::connection* conn,
+    picojson::object&	req,
+    picojson::object&	result
+) {
+
+}
+
 void test(sqlite::connection* conn) {
     reminder_element elem;
     elem.title = "aaa";
@@ -462,6 +595,12 @@ int main(int argc, const char *args[])
 	case CommandType::delet:
 		f_Delete(conn, obj, result);
 		break;
+    case CommandType::clear:
+        f_Clear(conn, obj, result);
+        break;
+    case CommandType::observe:
+        f_GetObserveData(conn, obj, result);
+        break;
 	default:
 		break;
 	};

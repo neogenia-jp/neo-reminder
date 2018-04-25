@@ -12,6 +12,8 @@ enum CommandType {
 	edit,		// 編集
 	finish,		// 完了
 	delet,		// 削除
+    clear,      // クリア
+    observe,    // observe
 
 	command_maxnum // 最大コマンド数
 };
@@ -71,13 +73,4 @@ struct FINISH_ST {
 struct DELETE_ST {
 	string		status;			// ステータス　(OK/Error)
 	string		message;		// メッセージ
-};
-
-map<string, CommandType> commandMap{
-	{ "list" , list },
-{ "create", create },
-{ "detail", detail },
-{ "edit",edit },
-{ "finish", finish },
-{ "delet", delet }
 };
