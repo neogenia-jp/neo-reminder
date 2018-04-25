@@ -1,0 +1,6 @@
+{
+  "command": "create",
+  "options": {
+    "title": "test reminder1"
+  }
+}

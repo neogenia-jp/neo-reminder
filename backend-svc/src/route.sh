@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd /mnt
+
 case $ROUTE in
   "moriguchi" ) exec CppBackendSvc/entrypoint.sh ;;
   "maeda"     ) exec CppBackendSvc/entrypoint.sh ;;
