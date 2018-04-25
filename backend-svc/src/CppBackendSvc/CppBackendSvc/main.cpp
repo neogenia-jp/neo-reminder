@@ -15,6 +15,17 @@ using namespace std;
 #define _ERROR		1	// 異常
 
 
+map<string, CommandType> commandMap{
+    { "list" , list },
+    { "create", create },
+    { "detail", detail },
+    { "edit", edit },
+    { "finish", finish },
+    { "delet", delet },
+    { "clear", clear },
+    { "observe", observe },
+};
+
 struct base_model {
     int id = 0;  //  1,
     virtual int save_or_update(sqlite::connection* conn) {
@@ -186,7 +197,30 @@ struct reminder_element : base_model {
         }
         return 0;
     }
+
+    /*
+    * @brief データ一括削除
+    * @param (conn) DB Connection オブジェクト
+    * @return 0:削除成功
+    * @return 1:削除エラー
+    */
+    int clear(sqlite::connection* conn) {
+        return 0;
+    }
+
+    /*
+    * @brief 各種データ取得
+    * @param (conn) DB Connection オブジェクト
+    * @return 0:正常
+    * @return 1:異常
+    */
+    int getObserveData(sqlite::connection* conn) {
+        return 0;
+    }
+
 };
+
+
 
 sqlite::connection* init_db() {
     try {
@@ -273,9 +307,10 @@ void f_Regist(
 	obj1.insert(std::make_pair("status", picojson::value(status)));
 	obj1.insert(std::make_pair("message", picojson::value(message)));
     obj1.insert(std::make_pair("created_at", picojson::value(elem.created_at)));
-    
 	result = obj1;
 }
+
+
 
 // 詳細表示
 void f_DspDetail(
@@ -333,8 +368,7 @@ void f_EditDetail(
     }
     obj1.insert(std::make_pair("status", picojson::value(status)));
     obj1.insert(std::make_pair("message", picojson::value(message)));
-    // TODO:とりあえず失敗でも作成日出力
-    obj1.insert(std::make_pair("created_at", picojson::value(elem.created_at)));
+    obj1.insert(std::make_pair("updated_at", picojson::value(elem.created_at)));
     
     result = obj1;
 }
@@ -404,6 +438,22 @@ void f_Delete(
     result = obj1;
 }
 
+void f_Clear(
+    sqlite::connection* conn,
+    picojson::object&	req,
+    picojson::object&	result
+){
+
+}
+
+void f_GetObserveData(
+    sqlite::connection* conn,
+    picojson::object&	req,
+    picojson::object&	result
+) {
+
+}
+
 void test(sqlite::connection* conn) {
     reminder_element elem;
     elem.title = "aaa";
@@ -464,6 +514,12 @@ int main(int argc, const char *args[])
 	case CommandType::delet:
 		f_Delete(conn, obj, result);
 		break;
+    case CommandType::clear:
+        f_Clear(conn, obj, result);
+        break;
+    case CommandType::observe:
+        f_GetObserveData(conn, obj, result);
+        break;
 	default:
 		break;
 	};
