@@ -73,11 +73,142 @@ struct DELETE_ST {
 	string		message;		// メッセージ
 };
 
-map<string, CommandType> commandMap{
-	{ "list" , list },
-{ "create", create },
-{ "detail", detail },
-{ "edit",edit },
-{ "finish", finish },
-{ "delet", delet }
+
+struct base_model {
+    int id = 0;  //  1,
+    virtual inline int save_or_update(sqlite::connection* conn) {
+        if (id == 0) {
+            return save(conn);
+        }
+        else {
+            return update(conn);
+        }
+    }
+    virtual int save(sqlite::connection* conn) = 0;
+    virtual int update(sqlite::connection* conn) = 0;
 };
+
+
+struct reminder_element : base_model {
+    string title ; //“xxxxxx”,
+    string notify_datetime; // “2018 - 03 - 20T19:32 : 00 + 0900”
+    string term; //“2018 - 03 - 20T19:32 : 00 + 0900”,  // ISO形式
+    string memo; //“xxxxxxxxxxxxxxxxxxxxxxx”,
+    string finished_at; // “2018-03-20T19:32:00+0900”,  // 完了日
+    string created_at; // “2018-03-20T19:32:00+0900”  // 作成日
+
+	template<class... A> static std::vector<reminder_element> select_all(sqlite::connection* conn, A... args) {
+		std::vector<string> v = { "1=1" };
+
+		for (auto i : std::initializer_list<const char*>{ args... }) {
+			string str(i);
+			v.push_back(str);
+		}
+
+		// カンマ区切りの文字列にする
+		const std::string s = boost::algorithm::join(v, " AND ");
+
+		string sql = "SELECT * FROM reminder_element WHERE ";
+		sql += s;
+		sqlite::query q(*conn, sql);
+
+		boost::shared_ptr<sqlite::result> result = q.get_result();
+
+		std::vector<reminder_element> list;
+		while (result->next_row()) {
+			reminder_element e;
+			e.load(result);
+			list.push_back(e);
+		}
+		return list;
+	}
+
+    /*
+    * @brief 詳細表示
+    * @param (conn) DB Connection オブジェクト
+    */
+	static reminder_element select(sqlite::connection* conn, int id);
+
+	void load(boost::shared_ptr<sqlite::result> result);
+
+	/*
+	* @brief データ新規登録
+	* @param (conn) DB Connection オブジェクト
+	* @return 0:登録成功
+	* @return 1:登録エラー
+	*/
+	int save(sqlite::connection* conn);
+
+	/*
+	* @brief データ更新
+	* @param (conn) DB Connection オブジェクト
+	* @return 0:登録成功
+	* @return 1:登録エラー
+	*/
+	int update(sqlite::connection* conn);
+
+    /*
+    * @brief データ完了更新
+    * @param (conn) DB Connection オブジェクト
+    * @return 0:更新成功
+    * @return 1:更新エラー
+    */
+	int finish(sqlite::connection* conn);
+
+    /*
+    * @brief データ削除
+    * @param (conn) DB Connection オブジェクト
+    * @return 0:削除成功
+    * @return 1:削除エラー
+    */
+	int dataDelete(sqlite::connection* conn);
+};
+
+// 一覧取得
+void f_GetList(
+	sqlite::connection* conn,
+	picojson::object&	req,
+	picojson::object&	result
+);
+
+
+// 登録
+void f_Regist(
+	sqlite::connection* conn,
+	picojson::object&	req,
+	picojson::object&	result
+);
+
+
+// 詳細表示
+void f_DspDetail(
+	sqlite::connection* conn,
+	picojson::object&	req,
+	picojson::object&	result
+);
+
+
+// 詳細編集
+void f_EditDetail(
+	sqlite::connection* conn,
+	picojson::object&	req,
+	picojson::object&	result
+);
+
+// 完了
+void f_Finish(
+	sqlite::connection* conn,
+	picojson::object&	req,
+	picojson::object&	result
+);
+
+// 削除
+void f_Delete(
+	sqlite::connection* conn,
+	picojson::object&	req,
+	picojson::object&	result
+);
+
+
+
+
