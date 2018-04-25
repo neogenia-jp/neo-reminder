@@ -29,7 +29,7 @@ module Yamamoto
     # 新規作成
     # @param contents [Hash] ファイルに書き込む内容
     # @param id [Integer] ファイルID（指定しない場合は次のIDを採番する）
-    # @return [Integer] 書き込んだバイト数
+    # @return [Hash] 書き込み後のファイルの内容
     def create(contents, id=nil)
       # IDがファイル名と二重管理になるため、消しておく
       contents.delete_if {|key, val| key == :id || key == 'id'}
@@ -41,12 +41,14 @@ module Yamamoto
 
       # TODO: ファイルの存在確認
       File.write(File.join(@data_base_path, "#{id}.json"), contents.to_json)
+
+      read(id)
     end
 
     # 更新
     # @param contents [Hash] ファイルに書き込む内容
     # @param id [Integer] ファイルID（指定しない場合は次のIDを採番する）
-    # @return [Integer] 書き込んだバイト数
+    # @return [Hash] 書き込み後のファイルの内容
     def update(contents, id)
       # IDがファイル名と二重管理になるため、消しておく
       contents.delete_if {|key, val| key == :id || key == 'id'}
@@ -58,6 +60,8 @@ module Yamamoto
       # TODO: ファイルの存在確認
       target = read(id)
       File.write(File.join(@data_base_path, "#{id}.json"), target.merge(contents).to_json)
+
+      read(id)
     end
 
     # 削除
