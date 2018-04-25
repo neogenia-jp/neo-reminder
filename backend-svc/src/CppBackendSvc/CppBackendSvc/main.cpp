@@ -67,19 +67,20 @@ struct reminder_element : base_model {
     * @brief 詳細表示
     * @param (conn) DB Connection オブジェクト
     */
-    void select(sqlite::connection* conn) {
+    static reminder_element select(sqlite::connection* conn, int id) {
         // INSERT SQL を作る
-        string sql = "SELECT * FROM reminder_element WHERE 1=1";
-        std::vector<std::string> v = { sql, to_string(id) };
-        const std::string joinSql = boost::algorithm::join(v, " AND ");
+        string sql = "SELECT * FROM reminder_element WHERE id = ";
+        sql += to_string(id);
 
         // データ詳細取得
-        sqlite::query q(*conn, joinSql);
+        sqlite::query q(*conn, sql);
         boost::shared_ptr<sqlite::result> result = q.get_result();
-
         // データ展開
-        reminder_element e;
-        e.load(result);
+        while (result->next_row()) {
+            reminder_element e;
+            e.load(result);
+            return e;
+        }
     }
 
     void load(boost::shared_ptr<sqlite::result> result) {
@@ -277,25 +278,23 @@ void f_Regist(
 // 詳細表示
 void f_DspDetail(
     sqlite::connection* conn,
-	picojson::object&	req,
-	picojson::object&	result
+    picojson::object&	req,
+    picojson::object&	result
 ) {
-    reminder_element elem;
-
-    elem.id = stoi(req["options"].get<picojson::object>()["id"].get<string>());
+    int id = (int)req["options"].get<picojson::object>()["id"].get<double>();
 
     // 詳細データ取得
-    elem.select(conn);
+    auto resultDB = reminder_element::select(conn, id);
 
     picojson::object obj1;
     // データをJSONへ格納
-    obj1.insert(std::make_pair("id", picojson::value((double)elem.id)));
-    obj1.insert(std::make_pair("title", picojson::value(elem.title)));
-    obj1.insert(std::make_pair("term", picojson::value(elem.term)));
-    obj1.insert(std::make_pair("memo", picojson::value(elem.memo)));
-    obj1.insert(std::make_pair("notify_datetime", picojson::value(elem.notify_datetime)));
-    obj1.insert(std::make_pair("created_at", picojson::value(elem.created_at)));
-    obj1.insert(std::make_pair("finished_at", picojson::value(elem.finished_at)));
+    obj1.insert(std::make_pair("id", picojson::value((double)resultDB.id)));
+    obj1.insert(std::make_pair("title", picojson::value(resultDB.title)));
+    obj1.insert(std::make_pair("term", picojson::value(resultDB.term)));
+    obj1.insert(std::make_pair("memo", picojson::value(resultDB.memo)));
+    obj1.insert(std::make_pair("notify_datetime", picojson::value(resultDB.notify_datetime)));
+    obj1.insert(std::make_pair("created_at", picojson::value(resultDB.created_at)));
+    obj1.insert(std::make_pair("finished_at", picojson::value(resultDB.finished_at)));
 
     result = obj1;
 }
