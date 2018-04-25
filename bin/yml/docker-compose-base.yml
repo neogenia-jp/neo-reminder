@@ -39,6 +39,8 @@ services:
       SMTP_USER_NAME      :
       SMTP_PASSWORD       :
       RPC_SERVER_PORT     :
+      NOTIFY_MAIL_TO      :
+      NOTIFY_MAIL_FROM    :
     command: /var/scripts/start_webapp.sh
 
   backend_svc:

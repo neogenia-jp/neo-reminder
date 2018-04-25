@@ -18,3 +18,6 @@ export APP_DOMAIN=reminder.neogenia.co.jp
 
 export RPC_SERVER_PORT=18089
 
+export NOTIFY_MAIL_TO=neogenia.dev+reminder@gmail.com
+export NOTIFY_MAIL_FROM=neogenia.dev+reminder@gmail.com
+
