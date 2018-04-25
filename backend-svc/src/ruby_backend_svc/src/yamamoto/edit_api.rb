@@ -11,7 +11,7 @@ module Yamamoto
       edit_id = json_data['options']['id']
       result = {}
       begin
-        @data_accessor.create(json_data['options'], edit_id)
+        @data_accessor.update(json_data['options'], edit_id)
         result[:status] = 'ok'
         result[:message] = ''
         result[:created_at] = @data_accessor.read(edit_id)['created_at']

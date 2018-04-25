@@ -1,5 +1,5 @@
 require 'test/unit'
-Dir[File.join(File.dirname(__FILE__), '../../src/yamamoto/*.rb')].each { |file| require file }
+require_relative '../../src/yamamoto/data_accessor'
 
 module Yamamoto
   class BaseTest < Test::Unit::TestCase
