@@ -1,4 +1,4 @@
-require 'time'
+require_relative 'data_accessor'
 
 module Yamamoto
   class BaseApi

@@ -1,5 +1,5 @@
 require 'json'
-Dir[File.dirname(__FILE__) + '/*.rb'].each {|file| require file }
+require_relative 'api_factory'
 
 module Yamamoto
   def self.main(request_json)

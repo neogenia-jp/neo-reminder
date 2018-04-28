@@ -1,3 +1,6 @@
+require 'date'
+require_relative './base_api'
+
 module Yamamoto
   class ListApi < BaseApi
 
