@@ -503,7 +503,8 @@ void f_Clear(
 
     // 結果送信
     picojson::object obj1;
-    string status, message;
+    string status;
+    string message;
     if (resultDB[0] == _SUCCESS) {
         status = "ok";
         message = "削除完了";
@@ -514,11 +515,19 @@ void f_Clear(
     }
     obj1.insert(std::make_pair("status", picojson::value(status)));
     obj1.insert(std::make_pair("message", picojson::value(message)));
-    string clearList;
-/*
-    for (int i = 1; resultDB.size; i++){
-        clearList += result[i];
-    }*/
+
+    // 削除されたIDのリストを登録する
+    string list = "[";
+
+    for (auto i = resultDB.begin() + 1; i != resultDB.end(); i++) {
+        list += to_string(resultDB[i]);
+        if (i != resultDB.end()) {
+            list.push_back(',');
+        }
+    }
+    list += "]";
+
+    obj1.insert(std::make_pair("affected_id_list", picojson::value(list)));
 
     // TODO:削除されたIDの列挙
     // obj1.insert(std::make_pair("affected_id_list", picojson::value(message)));
