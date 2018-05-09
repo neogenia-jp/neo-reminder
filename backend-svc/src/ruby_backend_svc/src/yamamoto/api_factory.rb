@@ -1,3 +1,10 @@
+require_relative './list_api'
+require_relative './create_api'
+require_relative './delete_api'
+require_relative './detail_api'
+require_relative './edit_api'
+require_relative './finish_api'
+
 module Yamamoto
   class ApiFactory
     def self.get(command_name)

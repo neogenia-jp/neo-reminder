@@ -1,3 +1,5 @@
+require_relative './base_api'
+
 module Yamamoto
   class CreateApi < BaseApi
     # 実行

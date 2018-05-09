@@ -1,3 +1,6 @@
+require 'time'
+require_relative './base_api'
+
 module Yamamoto
   class FinishApi < BaseApi
 
