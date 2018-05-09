@@ -12,6 +12,7 @@ enum CommandType {
 	edit,		// 編集
 	finish,		// 完了
 	delet,		// 削除
+    clear,      // クリア
 
 	command_maxnum // 最大コマンド数
 };
@@ -127,7 +128,7 @@ struct reminder_element : base_model {
     * @brief 詳細表示
     * @param (conn) DB Connection オブジェクト
     */
-	static reminder_element select(sqlite::connection* conn, int id);
+    static int reminder_element::select(sqlite::connection* conn, int id, reminder_element &e);
 
 	void load(boost::shared_ptr<sqlite::result> result);
 
@@ -162,6 +163,14 @@ struct reminder_element : base_model {
     * @return 1:削除エラー
     */
 	int dataDelete(sqlite::connection* conn);
+
+    /*
+    * @brief データ一括削除
+    * @param (conn) DB Connection オブジェクト
+    * @return 0:削除成功
+    * @return 1:削除エラー
+    */
+    vector<int> clear(sqlite::connection* conn, string option);
 };
 
 // 一覧取得

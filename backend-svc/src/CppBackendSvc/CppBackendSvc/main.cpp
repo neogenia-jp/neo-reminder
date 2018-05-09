@@ -17,7 +17,8 @@ map<string, CommandType> commandMap{
 { "detail", detail },
 { "edit",edit },
 { "finish", finish },
-{ "delet", delet }
+{ "delet", delet },
+{ "clear", clear }
 };
 
 
