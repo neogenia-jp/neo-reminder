@@ -202,7 +202,7 @@
     },
     methods: {
       load: function(id) {
-        callApiDetail(this);
+        callApiDetail(this, id);
         $('#element_details').modal('show');
       },
       onClickSave: function() {
