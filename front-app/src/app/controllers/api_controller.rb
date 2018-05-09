@@ -65,11 +65,11 @@ class ApiController < ApplicationController
     input_data = {
       command: "edit",
       options: {
-        id: params[:id],
-        title: params[:title],
-        notify_datetime: params[:notify_datetime],
-        term: params[:term],
-        memo: params[:memo]
+        id: params['id'],
+        title: params['title'],
+        notify_datetime: params['notify_datetime'],
+        term: params['term'],
+        memo: params['memo']
       }
     }
 

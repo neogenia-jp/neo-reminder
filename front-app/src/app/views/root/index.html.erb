@@ -79,7 +79,7 @@
           ID: {{ element.id }}
         </p>
         <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
-        <button type="button" class="btn btn-primary" v-on:click="onClickSave">反映</button>
+        <button type="button" class="btn btn-primary" v-on:click="onClickSave(this)" data-loading-text="loading...">反映</button>
       </div>
     </div>
   </div>
@@ -102,7 +102,7 @@
         console.log(output);
         vm.input_text = '';
         //that.sending = false;
-        setTimeout(function(){ callApiList(vm); }, 100);
+        vm.reload_later();
       },
       error: function () {
         //that.sending = false;
@@ -151,19 +151,14 @@
       success: function (response) {
         let output = JSON.parse(response.output);
         console.log(output);
-        setTimeout(function(){ callApiList(vm); }, 100);
         $('#element_details').modal('hide');
-        reload();
+        vm.reload_later();
       },
       error: function () {
         //that.sending = false;
         alert("エラーが発生しました。");
       }
     });
-  }
-
-  function reload(){
-    vm.reload();
   }
 
   var vm = new Vue({
@@ -178,13 +173,16 @@
     },
     methods: {
       fetchData: function() {
-        callApiList(this);
+        this.reload();
       },
       onCreate: function() {
-        reload();
+        callApiCreate(this);
       },
       reload: function() {
-        callApiCreate(this);
+        callApiList(this);
+      },
+      reload_later: function() {
+        setTimeout(function(){ vm.reload(); }, 100);
       },
       onClickDetail: function(id) {
         vm2.load(id);
@@ -205,7 +203,8 @@
         callApiDetail(this, id);
         $('#element_details').modal('show');
       },
-      onClickSave: function() {
+      onClickSave: function(obj) {
+        $(obj).button('loading');
         callApiEdit(this);
       }
     }
