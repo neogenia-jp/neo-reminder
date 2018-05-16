@@ -11,12 +11,15 @@
 using namespace std;
 
 // 処理結果ステータスコード
-#define _ERROR		0	// 異常
-#define _SUCCESS	1	// 正常
+#define _ERROR      0   // 異常
+#define _SUCCESS    1   // 正常
 
-// 削除対象フラグ
-#define _ALL_CLEAR		0	// 全削除
-#define _FINISHED_CLEAR 1   // 完了済のみ削除
+// 条件定義
+#define _ALL              0     // 全て
+#define _FINISHED         1     // 未完了
+#define _UNFINISHED       2     // 完了
+#define _TODAY            3     // 今日
+#define _CONDITION        4     // その他条件付き
 
 //-----------------------------------------------------------------------------
 // reminder_elelment functions
