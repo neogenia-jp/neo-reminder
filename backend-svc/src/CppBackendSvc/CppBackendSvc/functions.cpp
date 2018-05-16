@@ -236,7 +236,21 @@ void f_GetList(
 	picojson::object&	result
 )
 {
-    auto list = reminder_element::select_all(conn, "1=1");
+    // 条件の取得
+    string condition = req["options"].get<picojson::object>()["condition"].get<string>();
+    // 追加SQL文の作成
+    std::vector<string> addSql;
+
+    // 条件によるSQL文の追加
+    if (condition == "today") {
+        addSql.push_back("strftime('%Y-%m-%d', created_at) = CURRENT_DATE");
+    }
+    else if (condition == "unfinished") {
+        addSql.push_back("finished_at IS NULL");
+    }
+
+    // 一覧取得 実行
+    auto list = reminder_element::select_all(conn, addSql);
 
     picojson::array arr;
     for (auto i = list.begin(); i != list.end(); i++) {

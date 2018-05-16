@@ -98,12 +98,11 @@ struct reminder_element : base_model {
     string finished_at; // g2018-03-20T19:32:00+0900h,  // Š®—¹“ú
     string created_at; // g2018-03-20T19:32:00+0900h  // ì¬“ú
 
-	template<class... A> static std::vector<reminder_element> select_all(sqlite::connection* conn, A... args) {
+    static std::vector<reminder_element> select_all(sqlite::connection* conn, std::vector<string> condition) {
 		std::vector<string> v = { "1=1" };
 
-		for (auto i : std::initializer_list<const char*>{ args... }) {
-			string str(i);
-			v.push_back(str);
+		for (auto i : condition) {
+			v.push_back(i);
 		}
 
 		// ƒJƒ“ƒ}‹æØ‚è‚Ì•¶š—ñ‚É‚·‚é
