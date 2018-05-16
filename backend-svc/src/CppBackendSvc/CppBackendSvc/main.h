@@ -128,7 +128,7 @@ struct reminder_element : base_model {
     * @brief 詳細表示
     * @param (conn) DB Connection オブジェクト
     */
-    static int reminder_element::select(sqlite::connection* conn, int id, reminder_element &e);
+    static int select(sqlite::connection* conn, int id, reminder_element &e);
 
 	void load(boost::shared_ptr<sqlite::result> result);
 

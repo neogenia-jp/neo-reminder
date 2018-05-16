@@ -194,21 +194,26 @@ int reminder_element::select(sqlite::connection* conn, int id, reminder_element 
  vector<int> reminder_element::clear(sqlite::connection* conn, string option) {
      
      vector<int> ClearedID;                 // 削除対象ID
-     int status = 0;                        // 処理結果ステータス
-     int clearTarget = 0;                   // 削除対象フラグ
-     string sql = "DELETE FROM reminder_element WHERE 1 = 1";    // DELETE SQL を作る
+     int status = 1;                        // 処理結果ステータス
+     string selectSql = "SELECT ID ";       // SQL文頭　SELECT 
+     string deleteSql = "DELETE ";          // SQL文頭　DELETE
+     string sql = "FROM reminder_element WHERE 1 = 1";    // SQL文
 
      // 削除対象条件からSQL文を追加する
      if (option == "finished") {
          sql.append(" AND finished_at IS NOT NULL");
      }
 
+     // SQL文を結合
+     selectSql.append(sql);
+     deleteSql.append(sql);
+
      // 削除対象のIDを取得する
-     Get_ClearTarget(conn, ClearedID, sql);
+     Get_ClearTarget(conn, ClearedID, selectSql);
 
      try {
          // SQL(一括削除) を実行する
-         sqlite::execute del(*conn, sql);
+         sqlite::execute del(*conn, deleteSql);
          del();
      }
      catch (std::exception const & e) {
@@ -456,29 +461,20 @@ void f_Clear(
         status = "error";
         message = "削除失敗";
     }
-    obj1.insert(std::make_pair("status", picojson::value(status)));
-    obj1.insert(std::make_pair("message", picojson::value(message)));
 
-    // list型 
+    // 先頭に在るステータスの要素を削除
+    resultDB.erase(resultDB.begin());
 
+    // picojsonの配列に削除対象IDを格納 
+    picojson::array picoArray;
 
-
-    // TODO:int配列に書き直し
-    string list = "[";
-
-    for (auto i = resultDB.begin() + 1; i != resultDB.end(); i++) {
-        list += to_string(*i);
-        if (i != resultDB.end()) {
-            list.push_back(',');
-        }
+    for (int x : resultDB) {
+        picoArray.push_back(picojson::value((double)x));
     }
-    list += "]";
 
-    obj1.insert(std::make_pair("affected_id_list", picojson::value(list)));
-
-    // TODO:削除されたIDの列挙
-    // obj1.insert(std::make_pair("affected_id_list", picojson::value(message)));
-    // affected_id_list : [1, 2, …]   // 削除されたIDのリスト
+    obj1.insert(std::make_pair("affected_id_list", picojson::value(picoArray)));
+    obj1.insert(std::make_pair("message", picojson::value(message)));
+    obj1.insert(std::make_pair("status", picojson::value(status)));
 
     result = obj1;
 }

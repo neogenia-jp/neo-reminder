@@ -12,7 +12,7 @@ using namespace std;
 
 
 map<string, CommandType> commandMap{
-	{ "list" , list },
+    { "list" , list },
 { "create", create },
 { "detail", detail },
 { "edit",edit },
@@ -96,6 +96,9 @@ int main(int argc, const char *args[])
 	case CommandType::delet:
 		f_Delete(conn, obj, result);
 		break;
+    case CommandType::clear:
+        f_Clear(conn, obj, result);
+        break;
 	default:
 		break;
 	};
