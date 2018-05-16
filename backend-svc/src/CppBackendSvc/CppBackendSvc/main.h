@@ -218,6 +218,12 @@ void f_Delete(
 	picojson::object&	result
 );
 
+// ˆêŠ‡íœ
+void f_Clear(
+    sqlite::connection* conn,
+    picojson::object&	req,
+    picojson::object&	result
+);
 
 
 
