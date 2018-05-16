@@ -1,6 +1,12 @@
 #pragma once
 
 #include <iostream>
+#include <sqlite/connection.hpp>
+#include <sqlite/execute.hpp>
+#include <sqlite/query.hpp>
+#include <stdarg.h>
+#include <boost/algorithm/string/join.hpp>
+#include <boost/date_time/gregorian/gregorian.hpp>
 #include "picojson.h"
 
 using namespace std;
@@ -29,6 +35,10 @@ enum CommandType {
 //	created_at,			// 作成日
 //};
 
+sqlite::connection* init_db(string);
+sqlite::connection* init_db();
+
+void close_db(sqlite::connection* conn);
 
 // 一覧表示データ
 struct LIST_ST {
@@ -121,6 +131,10 @@ struct reminder_element : base_model {
 			list.push_back(e);
 		}
 		return list;
+	}
+	static std::vector<reminder_element> select_all(sqlite::connection* conn) {
+		std::vector<string> list;
+		return reminder_element::select_all(conn, list);
 	}
 
     /*

@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <ClCompile Include="functions.cpp" />
+    <ClCompile Include="main.cpp" />
+    <ClCompile Include="Makefile" />
+    <ClCompile Include="tests\test_functions.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\test_main.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="tests\test_sample.cpp">
+      <Filter>tests</Filter>
+    </ClCompile>
+    <ClCompile Include="connection.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="main.h" />
+    <ClInclude Include="picojson.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="tests">
+      <UniqueIdentifier>{d755dcc4-e76a-48ed-8845-9d6b57b4381c}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>
