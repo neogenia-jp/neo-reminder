@@ -2,3 +2,6 @@
 CppBackendSvc/obj/
 CppBackendSvc/bin/
 Release/
+*.o
+*.out
+
