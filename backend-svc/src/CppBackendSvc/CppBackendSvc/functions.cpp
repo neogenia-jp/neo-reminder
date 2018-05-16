@@ -14,6 +14,9 @@ using namespace std;
 #define _ERROR		0	// 異常
 #define _SUCCESS	1	// 正常
 
+// 削除対象フラグ
+#define _ALL_CLEAR		0	// 全削除
+#define _FINISHED_CLEAR 1   // 完了済のみ削除
 
 //-----------------------------------------------------------------------------
 // reminder_elelment functions
@@ -173,14 +176,12 @@ int reminder_element::select(sqlite::connection* conn, int id, reminder_element 
  * @param (conn) DB Connection オブジェクト
  * @param (&clearTaget) 削除対象ＩＤ格納変数
  */
- static void Get_ClearTarget(sqlite::connection * conn, std::vector<int> &clearTaget)
+ static void Get_ClearTarget(sqlite::connection * conn, std::vector<int> &ClearedID, string selectSql)
  {
-     // 削除対象となるレコードを調べ,格納する
-     string selectSql = "SELECT id FROM reminder_element WHERE 1 = 1 AND finished_at IS NOT NULL";
      sqlite::query q(*conn, selectSql);
      boost::shared_ptr<sqlite::result> result = q.get_result();
      while (result->next_row()) {
-         clearTaget.push_back(result->get_int(0));
+         ClearedID.push_back(result->get_int(0));
      }
  }
 
@@ -191,31 +192,33 @@ int reminder_element::select(sqlite::connection* conn, int id, reminder_element 
  * @return 1:削除エラー
  */
  vector<int> reminder_element::clear(sqlite::connection* conn, string option) {
-     // DELETE SQL を作る
-     string deleteSql = "DELETE FROM reminder_element WHERE 1 = 1";
-     vector<int> clearTaget;
-     int status = 0;
+     
+     vector<int> ClearedID;                 // 削除対象ID
+     int status = 0;                        // 処理結果ステータス
+     int clearTarget = 0;                   // 削除対象フラグ
+     string sql = "DELETE FROM reminder_element WHERE 1 = 1";    // DELETE SQL を作る
 
+     // 削除対象条件からSQL文を追加する
      if (option == "finished") {
-         // 削除対象のIDを取得
-         Get_ClearTarget(conn, clearTaget);
-         // DELETE SQL文に条件を追加
-         deleteSql.append(" AND finished_at IS NOT NULL");
+         sql.append(" AND finished_at IS NOT NULL");
      }
 
+     // 削除対象のIDを取得する
+     Get_ClearTarget(conn, ClearedID, sql);
+
      try {
-         // SQL を実行する
-         sqlite::execute del(*conn, deleteSql);
+         // SQL(一括削除) を実行する
+         sqlite::execute del(*conn, sql);
          del();
      }
      catch (std::exception const & e) {
          // TODO:エラーログ出力
-         status = -99;
+         status = _ERROR;
      }
      // 先頭にステータスを追加
-     clearTaget.insert(clearTaget.begin(), status);
+     ClearedID.insert(ClearedID.begin(), status);
 
-     return clearTaget;
+     return ClearedID;
  }
 
 // 一覧取得
@@ -455,6 +458,10 @@ void f_Clear(
     }
     obj1.insert(std::make_pair("status", picojson::value(status)));
     obj1.insert(std::make_pair("message", picojson::value(message)));
+
+    // list型 
+
+
 
     // TODO:int配列に書き直し
     string list = "[";
