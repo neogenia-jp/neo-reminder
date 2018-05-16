@@ -1,11 +1,5 @@
 #include <cstdio>
 #include <fstream>
-#include <sqlite/connection.hpp>
-#include <sqlite/execute.hpp>
-#include <sqlite/query.hpp>
-#include <stdarg.h>
-#include <boost/algorithm/string/join.hpp>
-#include <boost/date_time/gregorian/gregorian.hpp>
 #include "main.h"
 
 using namespace std;
@@ -20,29 +14,6 @@ map<string, CommandType> commandMap{
 { "delet", delet },
 { "clear", clear }
 };
-
-
-sqlite::connection* init_db() {
-    try {
-        auto con = new sqlite::connection("/mnt/CppBackendSvc/main.db");
-        return con;
-    }
-    catch (std::exception const & e) {
-        std::cerr << "An error occurred: " << e.what() << std::endl;
-    }
-    return NULL;
-}
-
-void close_db(sqlite::connection* conn) {
-    delete conn;
-}
-void test(sqlite::connection* conn) {
-    reminder_element elem;
-    elem.title = "aaa";
-    elem.memo = "memo";
-
-    elem.save_or_update(conn);
-}
 
 int main(int argc, const char *args[])
 {
