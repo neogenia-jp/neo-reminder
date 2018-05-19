@@ -20,7 +20,7 @@ module Yamamoto
 
       def save
         # 全モデル共通のアトリビュートを設定
-        _id = self.id || next_id
+        _id = self.id || self.class.next_id
         set_base_attribute(_id)
 
         # データ保存
@@ -52,28 +52,65 @@ module Yamamoto
         @@basic_attrs + (self.class_variable_get(:@@attrs) || [])
       end
 
+      # 主キー検索
+      # @param id [Integer] ファイルID
+      # @return [Class] モデルクラス 存在しない場合はnil
       def self.find(id)
-        contents = File.read(self.file_path(id))
+        begin
+          contents = File.read(self.file_path(id))
+        rescue => e
+          return nil
+        end
         init_values = JSON.parse(contents, symbolize_names: true).merge(id: id)
         self.new(init_values)
       end
 
+      # 全件取得
+      # @return [Array] モデルクラスの配列
       def self.all
-        id_list.map do |id|
-          find(id)
-        end
+        id_list.map { |id| find(id) }.compact
       end
 
+      # 検索
       def self.where(**attrs)
-        # eq
-        # lt
-        # gt
-        yield(all) if block_given?
+        operators = {gteq: '>=', gt: '>', lt: '<', lteq: '<='}
+        models = self.all
+
+        attrs.each do |attr_name, attr_val|
+          reg = nil
+
+          # 大なり小なりを確認
+          operators.each do |ope_name, ope|
+            if reg = attr_name.match(/(.+)_#{ope_name}$/)
+              models.select! { |m| eval(%Q(m.send("#{reg[1]}").to_s #{ope} "#{attr_val.to_s}")) }
+              break
+            end
+          end
+
+          # 上記以外の条件はイコール条件とみなす
+          unless reg
+            models.select! { |m| eval(%Q(m.send("#{attr_name}").to_s == "#{attr_val.to_s}")) }
+          end
+        end
+
+        models
       end
 
       # ファイルのパス
       def self.file_path(id)
         File.join(self.dir_path, "#{id}.json")
+      end
+
+      # 次のID
+      # @return [Integer] 次のID
+      def self.next_id
+        ids = id_list.map{|i| i.to_i}
+        ids.empty? ? 1 : ids.max + 1
+      end
+
+      # ファイルIDリスト
+      def self.id_list
+        Dir.glob(File.join(self.dir_path, "*")).map { |f_name| File.basename(f_name, ".json").to_i }
       end
 
       private
@@ -85,18 +122,6 @@ module Yamamoto
         # 作成日時、更新日時設定
         self.created_at = time.iso8601 unless File.exist?(self.class.file_path(self.id))
         self.updated_at = time.iso8601
-      end
-
-      # 次のID
-      # @return [Integer] 次のID
-      def next_id
-        ids = id_list.map{|i| i.to_i}
-        ids.empty? ? 1 : ids.max + 1
-      end
-
-      # ファイルIDリスト
-      def id_list
-        Dir.glob(File.join(self.class.dir_path, "*")).map { |f_name| File.basename(f_name, ".json").to_i }.sort
       end
     end
   end
