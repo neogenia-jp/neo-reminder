@@ -3,8 +3,9 @@ require 'time'
 
 module Yamamoto
   class DataAccessor
+    @@data_path = File.join(File.dirname(__FILE__), 'data')
     def initialize(model_dir_name=nil)
-      @data_base_path = File.join(File.dirname(__FILE__), 'data')
+      @data_base_path = @@data_path
       @data_base_path = File.join(@data_base_path, model_dir_name) if model_dir_name
     end
 
