@@ -14,8 +14,7 @@ module Kamada
         when 'list'
           ListApi.new
         when 'create'
-          ClearApi.new
-          #CreateApi.new
+          CreateApi.new
         when 'delete'
           DeleteApi.new
         when 'detail'
@@ -26,6 +25,8 @@ module Kamada
           FinishApi.new
         when 'clear'
           ClearApi.new
+        when 'observe'
+          ObserveApi.new
         else
           nil
       end

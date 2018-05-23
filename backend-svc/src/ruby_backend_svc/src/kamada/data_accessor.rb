@@ -69,16 +69,16 @@ module Kamada
     end
 
     # まとめて削除
-    # @param target[String] 削除対象
+    # @param target [String] 削除対象(all:全削除　finished:完了済みだけ削除)
+    # @return [Array] 削除したデータのidの配列
     def clear(target)
-      binding.pry
       if target == "all"
         id_list.map {|id|
           delete(id)
           id
         }
       elsif target == "finished"
-        foo = id_list.select {|id|
+        id_list.select {|id|
           data = read(id)
           if data["finished_at"].nil?
             nil
@@ -87,8 +87,24 @@ module Kamada
             id
           end
         }
-        binding.pry
       end
+    end
+
+    # @param options [Hash]
+    # @return [Array] データの配列
+    def observe(options)
+      data = []
+
+      all_read.each do |item|
+        data << {
+            subject: "「#{item['title']}」の通知",
+            body: item["memo"],
+            svc_data: {
+                # ログなど、サービスごとに自由なデータを返すことができる。
+            }
+        }
+      end
+      return data
     end
 
     # 次のID

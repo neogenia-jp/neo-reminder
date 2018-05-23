@@ -1,19 +1,18 @@
 require_relative './base_api'
 
 module Kamada
-  class ClearApi < BaseApi
+  class ObserveApi < BaseApi
 
     # 実行
     # @param json_data [Hash] 送られてきたJSONデータ
     # @return [Hash]
     def run(json_data)
-      # リマインダーを削除する
       result = {}
       begin
-        list = @data_accessor.clear(json_data['options']['target'])
+        list = @data_accessor.observe(json_data['options'])
         result[:status] = 'ok'
         result[:message] = 'xxxxxxxxx'
-        result[:affected_id_list] = list
+        result[:notifications] = list
       rescue => e
         result[:status] = 'error'
         result[:message] = e.message
