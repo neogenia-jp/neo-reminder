@@ -1,12 +1,11 @@
 require 'json'
-require 'singleton'
 require 'time'
 
 module Yamamoto
   class DataAccessor
-    include Singleton
-    def initialize
+    def initialize(model_dir_name=nil)
       @data_base_path = File.join(File.dirname(__FILE__), 'data')
+      @data_base_path = File.join(@data_base_path, model_dir_name) if model_dir_name
     end
 
     # データ読み込み
