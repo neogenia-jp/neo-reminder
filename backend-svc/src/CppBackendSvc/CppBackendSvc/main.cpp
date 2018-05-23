@@ -4,7 +4,6 @@
 
 using namespace std;
 
-
 map<string, CommandType> commandMap{
     { "list" , list },
 { "create", create },
@@ -47,32 +46,40 @@ int main(int argc, const char *args[])
 
     picojson::object result;
 
-	// 受け取ったコマンドによる処理
-	switch (commandMap[command]) {
-	case CommandType::list:
-		f_GetList(conn, obj, result);
-		break;
-	case CommandType::create:
-		f_Regist(conn, obj, result);
-		break;
-	case CommandType::detail:
-		f_DspDetail(conn, obj, result);
-		break; 
-	case CommandType::edit:
-		f_EditDetail(conn, obj, result);
-		break;
-	case CommandType::finish:
-		f_Finish(conn, obj, result);
-		break;
-	case CommandType::delet:
-		f_Delete(conn, obj, result);
-		break;
-    case CommandType::clear:
-        f_Clear(conn, obj, result);
-        break;
-	default:
-		break;
-	};
+	for (auto entry : FUNC_TABLE) {
+		if (entry.name == command)
+		{
+			entry.f_Api(conn, obj, result);
+			break;
+		}
+	}
+
+	//// 受け取ったコマンドによる処理
+	//switch (commandMap[command]) {
+	//case CommandType::list:
+	//	f_GetList(conn, obj, result);
+	//	break;
+	//case CommandType::create:
+	//	f_Regist(conn, obj, result);
+	//	break;
+	//case CommandType::detail:
+	//	f_DspDetail(conn, obj, result);
+	//	break; 
+	//case CommandType::edit:
+	//	f_EditDetail(conn, obj, result);
+	//	break;
+	//case CommandType::finish:
+	//	f_Finish(conn, obj, result);
+	//	break;
+	//case CommandType::delet:
+	//	f_Delete(conn, obj, result);
+	//	break;
+ //   case CommandType::clear:
+ //       f_Clear(conn, obj, result);
+ //       break;
+	//default:
+	//	break;
+	//};
 
     // 文字列にするためにvalueを使用
     picojson::value val(result);

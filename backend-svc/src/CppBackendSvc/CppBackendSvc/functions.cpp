@@ -10,9 +10,7 @@
 
 using namespace std;
 
-// 処理結果ステータスコード
-#define _ERROR      0   // 異常
-#define _SUCCESS    1   // 正常
+vector<FUNC_ENTRY> FUNC_TABLE;
 
 // 条件定義
 #define _ALL              0     // 全て
@@ -204,7 +202,7 @@ int reminder_element::select(sqlite::connection* conn, int id, reminder_element 
 
      // 削除対象条件からSQL文を追加する
      if (option == "finished") {
-         sql.append(" AND finished_at IS NOT NULL");
+         sql.append(" AND finished_at IS NOT NULL AND finished_at <> '' ");
      }
 
      // SQL文を結合
@@ -275,13 +273,30 @@ void f_GetList(
 * @brief 現在日時取得
 * @return (buf) string 現在日時
 */
+string _f_GetTime()
+{
+	time_t now = std::time(nullptr);
+	const tm* lt = localtime(&now);
+	char buf[128];
+	strftime(buf, sizeof(buf), "%FT%T+09:00", lt);
+	return buf;
+}
+
+/*
+* @brief 現在日時の裏口取得
+*/
+string uraguchi;
+
 string f_GetTime()
 {
-    time_t now = std::time(nullptr);
-    const tm* lt = localtime(&now);
-    char buf[128];
-    strftime(buf, sizeof(buf), "%FT%T+09:00", lt);
-    return buf;
+	if (uraguchi != "")
+	{
+		// uraguchiを一回限り有効とする
+		string kari = uraguchi;
+		uraguchi = "";
+		return kari;
+	}
+	return _f_GetTime();
 }
 
 // 登録

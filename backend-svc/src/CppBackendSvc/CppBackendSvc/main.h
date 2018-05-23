@@ -11,6 +11,12 @@
 
 using namespace std;
 
+
+// 処理結果ステータスコード
+#define _ERROR      0   // 異常
+#define _SUCCESS    1   // 正常
+
+
 enum CommandType {
 	list = 1,	// 一覧表示
 	create,		// 新規作成
@@ -84,6 +90,8 @@ struct DELETE_ST {
 	string		message;		// メッセージ
 };
 
+// 裏口設定
+extern string uraguchi;
 
 struct base_model {
     int id = 0;  //  1,
@@ -186,57 +194,126 @@ struct reminder_element : base_model {
     vector<int> clear(sqlite::connection* conn, string option);
 };
 
+
+
+struct FUNC_ENTRY {
+	string name;
+	void (*f_Api)(
+		sqlite::connection*,
+		picojson::object&,
+		picojson::object&
+		);
+};
+
+extern vector<FUNC_ENTRY> FUNC_TABLE;
+
+//enum
+//{
+//	delet = 1,
+//	save = 1,
+//
+//
+//
+//};
+
+class FuncRegestorer
+{
+public:
+	FuncRegestorer(string name, void(*f_Api)(
+		sqlite::connection*,
+		picojson::object&,
+		picojson::object&
+		)) {
+		FUNC_ENTRY entry;
+		entry.name = name;
+		entry.f_Api = f_Api;
+		FUNC_TABLE.push_back(entry);
+	}
+};
+	//
+//void func()
+//{
+//	// メモリの初期化
+//
+//	func[delet] = &deletFunc;
+//	func[save]	= &saveFunc;
+//
+//
+//}
+//
+//void deletFunc() {};
+//void saveFunc() {};
+
+#define DEF_API(name, function_name) \
+void function_name( \
+	sqlite::connection* conn, \
+	picojson::object&	req, \
+	picojson::object&	result \
+); \
+static FuncRegestorer ___##function_name(name, function_name); 
+
+DEF_API("list", f_GetList);
+DEF_API("regist", f_Regist);
+DEF_API("detail", f_DspDetail);
+DEF_API("edit", f_EditDetail);
+DEF_API("finish", f_Finish);
+DEF_API("delete", f_Delete);
+DEF_API("clear", f_Clear);
+
+
 // 一覧取得
-void f_GetList(
-	sqlite::connection* conn,
-	picojson::object&	req,
-	picojson::object&	result
-);
+//void f_GetList(
+//	sqlite::connection* conn,
+//	picojson::object&	req,
+//	picojson::object&	result
+//);
+//static FuncRegestorer dmy1("list", f_GetList);
 
 
-// 登録
-void f_Regist(
-	sqlite::connection* conn,
-	picojson::object&	req,
-	picojson::object&	result
-);
-
-
-// 詳細表示
-void f_DspDetail(
-	sqlite::connection* conn,
-	picojson::object&	req,
-	picojson::object&	result
-);
-
-
-// 詳細編集
-void f_EditDetail(
-	sqlite::connection* conn,
-	picojson::object&	req,
-	picojson::object&	result
-);
-
-// 完了
-void f_Finish(
-	sqlite::connection* conn,
-	picojson::object&	req,
-	picojson::object&	result
-);
-
-// 削除
-void f_Delete(
-	sqlite::connection* conn,
-	picojson::object&	req,
-	picojson::object&	result
-);
-
-// 一括削除
-void f_Clear(
-    sqlite::connection* conn,
-    picojson::object&	req,
-    picojson::object&	result
-);
-
-
+//
+//// 登録
+//void f_Regist(
+//	sqlite::connection* conn,
+//	picojson::object&	req,
+//	picojson::object&	result
+//);
+//
+//
+//// 詳細表示
+//void f_DspDetail(
+//	sqlite::connection* conn,
+//	picojson::object&	req,
+//	picojson::object&	result
+//);
+//
+//
+//// 詳細編集
+//void f_EditDetail(
+//	sqlite::connection* conn,
+//	picojson::object&	req,
+//	picojson::object&	result
+//);
+//
+//// 完了
+//void f_Finish(
+//	sqlite::connection* conn,
+//	picojson::object&	req,
+//	picojson::object&	result
+//);
+//
+//// 削除
+//void f_Delete(
+//	sqlite::connection* conn,
+//	picojson::object&	req,
+//	picojson::object&	result
+//);
+//
+//// 一括削除
+//void f_Clear(
+//    sqlite::connection* conn,
+//    picojson::object&	req,
+//    picojson::object&	result
+//);
+//
+//
 
