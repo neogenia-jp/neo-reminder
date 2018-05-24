@@ -4,4 +4,5 @@ CppBackendSvc/bin/
 Release/
 *.o
 *.out
-
+db_tool_main
+test_main

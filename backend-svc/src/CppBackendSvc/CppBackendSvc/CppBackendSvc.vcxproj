@@ -103,6 +103,8 @@
   </PropertyGroup>
   <ItemGroup>
     <ClCompile Include="connection.cpp" />
+    <ClCompile Include="db_tool\db_tool_main.cpp" />
+    <ClCompile Include="db_tool\migrator.cpp" />
     <ClCompile Include="functions.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Makefile" />
@@ -111,6 +113,7 @@
     <ClCompile Include="tests\test_sample.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="db_tool\migrator.h" />
     <ClInclude Include="main.h" />
     <ClInclude Include="picojson.h" />
   </ItemGroup>

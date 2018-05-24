@@ -14,14 +14,26 @@
       <Filter>tests</Filter>
     </ClCompile>
     <ClCompile Include="connection.cpp" />
+    <ClCompile Include="db_tool\db_tool_main.cpp">
+      <Filter>db_tool</Filter>
+    </ClCompile>
+    <ClCompile Include="db_tool\migrator.cpp">
+      <Filter>db_tool</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
     <ClInclude Include="picojson.h" />
+    <ClInclude Include="db_tool\migrator.h">
+      <Filter>db_tool</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="tests">
       <UniqueIdentifier>{d755dcc4-e76a-48ed-8845-9d6b57b4381c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="db_tool">
+      <UniqueIdentifier>{8cebb6d8-1c2a-44d4-a9b0-9a1be57e3b97}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
 </Project>
