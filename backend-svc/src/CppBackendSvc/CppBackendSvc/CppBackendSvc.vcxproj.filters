@@ -35,5 +35,8 @@
     <Filter Include="db_tool">
       <UniqueIdentifier>{8cebb6d8-1c2a-44d4-a9b0-9a1be57e3b97}</UniqueIdentifier>
     </Filter>
+    <Filter Include="db_tool\migrations">
+      <UniqueIdentifier>{b4f308f1-e4c3-47ae-a3e6-03e00d665ed4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
 </Project>

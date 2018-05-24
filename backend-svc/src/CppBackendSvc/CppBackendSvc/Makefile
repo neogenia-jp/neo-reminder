@@ -3,7 +3,7 @@
 # プログラム名とオブジェクトファイル名
 PROGRAM = CppBackendSvc.out
 MAIN_OBJ = main.o
-OBJS = connection.o functions.o db_tool/migrator.o
+OBJS = connection.o functions.o
 TEST_OBJS = tests/test_main.o tests/test_functions.o tests/test_sample.o
 
 # 定義済みマクロの再定義
@@ -30,7 +30,7 @@ $(PROGRAM): $(OBJS) $(MAIN_OBJ)
 clean:
 	$(RM) $(PROGRAM) $(MAIN_OBJ) $(OBJS) $(TEST_OBJS)
 
-db_tool: db_tool/db_tool_main.o
+db_tool: db_tool/db_tool_main.o db_tool/migrator.o
 	$(CXX) $(CXXFLAGS) $(CFLAGS) -o db_tool_main $^ $(LIBS)
 	
 test: $(OBJS) $(TEST_OBJS)

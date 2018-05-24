@@ -1,38 +1,57 @@
 #pragma once
 
 #include <string>
+#include <vector>
 #include <sqlite/connection.hpp>
+#include <sqlite/database_exception.hpp>
 
 using namespace std;
 
 namespace DBTool {
-	
-	class Migrator
-	{
-			
-	public:
-		Migrator();
-		~Migrator();
 
-	protected:
-		sqlite::connection* conn;
-		virtual void Open();
+    struct MigrationEntry {
+        string file_name;
+        string version;
+        string description;
+        bool applied = false;
 
-		virtual void Close();
+        MigrationEntry(string file_name);
+        MigrationEntry() {};
+    };
 
-	public:
-		virtual void CreateDatabase(string name);
+    class Migrator
+    {
 
-		virtual string GetCurrentDatabase();
+    public:
+        Migrator();
+        ~Migrator();
 
-		virtual void ChangeDatabase(string name);
+    protected:
+        sqlite::connection* conn = NULL;
+        string database_name;
+        map<string, MigrationEntry>* migrations = NULL;
 
-		virtual void Status();
+        virtual void Open();
 
-		virtual void Up();
+        virtual void Close();
 
-		virtual void Down();
+        virtual void ReloadMigrations(string dir);
 
-	};
+    public:
+        virtual void CreateDatabase(string name);
+
+        virtual string GetCurrentDatabase();
+
+        virtual void ChangeDatabase(string name);
+
+        virtual map<string, MigrationEntry> Status();
+
+        virtual void Up();
+
+        virtual void Reapply(string version);
+
+        virtual void Down();
+
+    };
 
 }
