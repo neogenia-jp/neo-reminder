@@ -12,7 +12,7 @@ CC = gcc
 CFLAGS = -Wall  -g -O0
 #CXXFLAGS = -std=c++11
 CXXFLAGS = -std=c++11
-LIBS =  -lvsqlitepp
+LIBS =  -lvsqlitepp -lboost_filesystem -lboost_system
 
 # サフィックスルール適用対象の拡張子の定義
 .SUFFIXES: .cpp .o
@@ -31,7 +31,7 @@ clean:
 	$(RM) $(PROGRAM) $(MAIN_OBJ) $(OBJS) $(TEST_OBJS)
 
 db_tool: db_tool/db_tool_main.o db_tool/migrator.o
-	$(CXX) $(CXXFLAGS) $(CFLAGS) -o db_tool_main $^ $(LIBS)
+	$(CXX) $(CXXFLAGS) $(CFLAGS) -o db_tool_main $^ $(LIBS) 
 	
 test: $(OBJS) $(TEST_OBJS)
 	$(CXX) $(CXXFLAGS) $(CFLAGS) -o test_main $^ $(LIBS) -lboost_unit_test_framework

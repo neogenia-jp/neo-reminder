@@ -2,6 +2,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 #include <sqlite/connection.hpp>
 #include <sqlite/database_exception.hpp>
 
@@ -50,7 +51,7 @@ namespace DBTool {
 
         virtual void Reapply(string version);
 
-        virtual void Down();
+        virtual void Down(int steps);
 
     };
 
