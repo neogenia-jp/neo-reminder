@@ -150,6 +150,11 @@ int ProcessCmdLine(DBTool::Migrator &migrator, const char* line)
  */
 int main(int argc, const char *argv[])
 {
+	cout
+		<< "************************************************************" << endl
+		<< "* Database management tool for SQLite3" << endl
+		<< "*             " VERSION "  written by " AUTHOR  << endl
+		<< "************************************************************" << endl;
     Migrator migrator;
     string line;
 

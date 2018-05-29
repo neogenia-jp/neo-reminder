@@ -6,6 +6,9 @@
 #include <sqlite/connection.hpp>
 #include <sqlite/database_exception.hpp>
 
+#define VERSION "2018-05-29"
+#define AUTHOR  "w.maeda@neogenia.co.jp"
+
 using namespace std;
 
 namespace DBTool {
