@@ -11,13 +11,15 @@ using namespace std;
 namespace DBTool {
 
     struct MigrationEntry {
-        string file_name;
+        string filepath;
         string version;
         string description;
         bool applied = false;
 
-        MigrationEntry(string file_name);
+        MigrationEntry(string);
         MigrationEntry() {};
+
+        string basename();
     };
 
     class Migrator
@@ -36,8 +38,6 @@ namespace DBTool {
 
         virtual void Close();
 
-        virtual void ReloadMigrations(string dir);
-
     public:
         virtual void CreateDatabase(string name);
 
@@ -45,13 +45,15 @@ namespace DBTool {
 
         virtual void ChangeDatabase(string name);
 
+        virtual void ReloadMigrations(string dir);
+
         virtual map<string, MigrationEntry> Status();
 
-        virtual void Up();
+        virtual int Up();
 
         virtual void Reapply(string version);
 
-        virtual void Down(int steps);
+        virtual int Down(int steps);
 
     };
 

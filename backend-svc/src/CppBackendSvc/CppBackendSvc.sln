@@ -7,6 +7,9 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CppBackendSvc", "CppBackend
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		DBTool|ARM = DBTool|ARM
+		DBTool|x64 = DBTool|x64
+		DBTool|x86 = DBTool|x86
 		Debug|ARM = Debug|ARM
 		Debug|x64 = Debug|x64
 		Debug|x86 = Debug|x86
@@ -18,6 +21,12 @@ Global
 		Test|x86 = Test|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.DBTool|ARM.ActiveCfg = DBTool|ARM
+		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.DBTool|ARM.Build.0 = DBTool|ARM
+		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.DBTool|x64.ActiveCfg = DBTool|x64
+		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.DBTool|x64.Build.0 = DBTool|x64
+		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.DBTool|x86.ActiveCfg = DBTool|x86
+		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.DBTool|x86.Build.0 = DBTool|x86
 		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.Debug|ARM.ActiveCfg = Debug|ARM
 		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.Debug|ARM.Build.0 = Debug|ARM
 		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.Debug|x64.ActiveCfg = Debug|x64

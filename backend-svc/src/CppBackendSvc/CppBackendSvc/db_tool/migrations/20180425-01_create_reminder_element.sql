@@ -1,4 +1,4 @@
--- UP
+-- [UP]
 CREATE TABLE reminder_element (
 	id INTEGER PRIMARY KEY,
     title TEXT ,
@@ -10,6 +10,6 @@ CREATE TABLE reminder_element (
 )
 ;
 
--- DOWN
+-- [DOWN]
 DROP TABLE reminder_element
 ;

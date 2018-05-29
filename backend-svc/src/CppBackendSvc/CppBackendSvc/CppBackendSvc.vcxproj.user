@@ -17,4 +17,10 @@
     <RemoteDebuggerCommand>/home/neo/projects/CppBackendSvc/test_main</RemoteDebuggerCommand>
     <RemoteDebuggerWorkingDirectory>/home/neo/projects/CppBackendSvc/</RemoteDebuggerWorkingDirectory>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='DBTool|x64'">
+    <RemoteDebuggerCommandArguments>db_tool/migrations main</RemoteDebuggerCommandArguments>
+    <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
+    <RemoteDebuggerCommand>/home/neo/projects/CppBackendSvc/db_tool_main</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>/home/neo/projects/CppBackendSvc/</RemoteDebuggerWorkingDirectory>
+  </PropertyGroup>
 </Project>

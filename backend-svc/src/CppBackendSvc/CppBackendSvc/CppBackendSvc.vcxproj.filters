@@ -39,4 +39,12 @@
       <UniqueIdentifier>{b4f308f1-e4c3-47ae-a3e6-03e00d665ed4}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="db_tool\migrations\20180425-01_create_reminder_element.sql">
+      <Filter>db_tool\migrations</Filter>
+    </None>
+    <None Include="db_tool\migrations\20180529-01_create_notification_history.sql">
+      <Filter>db_tool\migrations</Filter>
+    </None>
+  </ItemGroup>
 </Project>
