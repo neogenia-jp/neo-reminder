@@ -1,12 +1,12 @@
 # Makefile
 
-# �v���O�������ƃI�u�W�F�N�g�t�@�C����
+# プログラム名とオブジェクトファイル名
 PROGRAM = CppBackendSvc.out
 MAIN_OBJ = main.o
 OBJS = connection.o functions.o
 TEST_OBJS = tests/test_main.o tests/test_functions.o tests/test_sample.o
 
-# ��`�ς݃}�N���̍Ē�`
+# 定義済みマクロの再定義
 CC = gcc
 #CFLAGS = -Wall -O2
 CFLAGS = -Wall  -g -O0
@@ -14,18 +14,18 @@ CFLAGS = -Wall  -g -O0
 CXXFLAGS = -std=c++11
 LIBS =  -lvsqlitepp -lboost_filesystem -lboost_system
 
-# �T�t�B�b�N�X���[���K�p�Ώۂ̊g���q�̒�`
+# サフィックスルール適用対象の拡張子の定義
 .SUFFIXES: .cpp .o
 
-# �v���C�}���^�[�Q�b�g
+# プライマリターゲット
 $(PROGRAM): $(OBJS) $(MAIN_OBJ)
 	$(CXX) $(CXXFLAGS) $(CFLAGS) -o $(PROGRAM) $^ $(LIBS)
 
-# �T�t�B�b�N�X���[��
+# サフィックスルール
 .cpp.o:
 	$(CXX) $(CXXFLAGS) $(CFLAGS) -o $@ -c $<
 
-# �t�@�C���폜�p�^�[�Q�b�g
+# ファイル削除用ターゲット
 .PHONY: clean
 clean:
 	$(RM) $(PROGRAM) $(MAIN_OBJ) $(OBJS) $(TEST_OBJS)
