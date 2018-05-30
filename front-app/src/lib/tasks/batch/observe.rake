@@ -16,7 +16,7 @@ namespace :batch do
       route = (args['option'])
 
       # バッチ処理開始
-      logger.info_scope("start: update_company_ir_info") do
+      logger.info_scope("start: ObserveHandler") do
         ObserveHandler.new(route).exec
       end
 

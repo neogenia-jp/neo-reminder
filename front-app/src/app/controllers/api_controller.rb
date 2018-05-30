@@ -42,7 +42,7 @@ class ApiController < ApplicationController
     input_data = {
       command: "detail",
       options: {
-        id: params[:id]
+        id: params[:id].to_i
       }
     }
 
@@ -65,7 +65,7 @@ class ApiController < ApplicationController
     input_data = {
       command: "edit",
       options: {
-        id: params['id'],
+        id: params['id'].to_i,
         title: params['title'],
         notify_datetime: params['notify_datetime'],
         term: params['term'],

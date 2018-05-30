@@ -253,7 +253,7 @@ void function_name( \
 static FuncRegestorer ___##function_name(name, function_name); 
 
 DEF_API("list", f_GetList);
-DEF_API("regist", f_Regist);
+DEF_API("create", f_Regist);
 DEF_API("detail", f_DspDetail);
 DEF_API("edit", f_EditDetail);
 DEF_API("finish", f_Finish);
