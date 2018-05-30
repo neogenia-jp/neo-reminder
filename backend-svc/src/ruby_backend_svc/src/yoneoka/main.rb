@@ -1,6 +1,16 @@
+require 'json'
+require_relative 'api_factory'
+
 module Yoneoka
   def self.main(request_json)
-    '{status: "ok"}'
+    # JSON解析
+    json_data = JSON.parse(request_json)
+
+    # APIクラス作成
+    api = ApiFactory.get(json_data['command'])
+
+    # 実行
+    api.run(json_data).to_json
   end
 end
 
