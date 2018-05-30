@@ -7,7 +7,6 @@ class ApplicationController < ActionController::Base
 
   # 例外ハンドラ
   rescue_from Exception,                      with: :render_500 unless Rails.env.development?
-  rescue_from AppNotFoundError,               with: :render_404 unless Rails.env.development?
   rescue_from ActionController::RoutingError, with: :render_404 unless Rails.env.development?
 
   def handle_validation_error
