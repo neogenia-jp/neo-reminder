@@ -9,20 +9,19 @@ module Kamada
     # @return [Hash]
     def run(json_data)
 
-      case json_data['options']
-      when 'all'
-        list = reminder_list_all
-      when 'today'
-        list = reminder_list_today
-      when 'unfinished'
-        list = reminder_list_unfinished
+      list =
+        case json_data['options']['condition']
+        when 'all';        reminder_list_all
+        when 'today';      reminder_list_today
+        when 'unfinished'; reminder_list_unfinished
+        else []
+        end
 
       # 完了しているかどうかのフラグを付与する
       list.each do |r|
         r['finished'] = r['finished_at'].nil? ? false : true
       end
 
-      # JSON形式にフォーマットし文字列で返す
       { list: list }
     end
 
