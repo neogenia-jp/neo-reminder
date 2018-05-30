@@ -30,6 +30,9 @@ RUN apt-get install -y \
 RUN apt-get install -y \
   libboost-test-dev
 
+RUN apt-get install -y \
+  libboost-filesystem-dev
+
 # add user
 RUN useradd neo -m -s /bin/bash \
  && echo 'neo:neo' | chpasswd
