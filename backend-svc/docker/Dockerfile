@@ -27,6 +27,9 @@ RUN apt-get install -y \
   libvsqlitepp-dev \
   sqlite3
 
+RUN apt-get install -y \
+  libboost-test-dev
+
 # add user
 RUN useradd neo -m -s /bin/bash \
  && echo 'neo:neo' | chpasswd

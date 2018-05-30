@@ -13,6 +13,9 @@ Global
 		Release|ARM = Release|ARM
 		Release|x64 = Release|x64
 		Release|x86 = Release|x86
+		Test|ARM = Test|ARM
+		Test|x64 = Test|x64
+		Test|x86 = Test|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.Debug|ARM.ActiveCfg = Debug|ARM
@@ -27,6 +30,12 @@ Global
 		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.Release|x64.Build.0 = Release|x64
 		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.Release|x86.ActiveCfg = Release|x86
 		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.Release|x86.Build.0 = Release|x86
+		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.Test|ARM.ActiveCfg = Debug|ARM
+		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.Test|ARM.Build.0 = Debug|ARM
+		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.Test|x64.ActiveCfg = Test|x64
+		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.Test|x64.Build.0 = Test|x64
+		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.Test|x86.ActiveCfg = Debug|x86
+		{1E5D5454-8216-42C1-A310-6FE6F1E6C0B7}.Test|x86.Build.0 = Debug|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

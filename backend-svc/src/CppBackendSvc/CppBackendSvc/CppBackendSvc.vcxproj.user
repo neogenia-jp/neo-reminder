@@ -11,4 +11,10 @@
     <RemoteDebuggerCommand>/home/neo/projects/CppBackendSvc/CppBackendSvc.out</RemoteDebuggerCommand>
     <RemoteDebuggerWorkingDirectory>/home/neo/projects/CppBackendSvc/</RemoteDebuggerWorkingDirectory>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Test|x64'">
+    <RemoteDebuggerCommandArguments>--log_level=all --run_test=</RemoteDebuggerCommandArguments>
+    <DebuggerFlavor>LinuxDebugger</DebuggerFlavor>
+    <RemoteDebuggerCommand>/home/neo/projects/CppBackendSvc/test_main</RemoteDebuggerCommand>
+    <RemoteDebuggerWorkingDirectory>/home/neo/projects/CppBackendSvc/</RemoteDebuggerWorkingDirectory>
+  </PropertyGroup>
 </Project>
