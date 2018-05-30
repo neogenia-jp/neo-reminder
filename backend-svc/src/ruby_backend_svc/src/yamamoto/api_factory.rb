@@ -4,6 +4,8 @@ require_relative './delete_api'
 require_relative './detail_api'
 require_relative './edit_api'
 require_relative './finish_api'
+require_relative './clear_api'
+require_relative './observe_api'
 
 module Yamamoto
   class ApiFactory
@@ -22,6 +24,10 @@ module Yamamoto
           EditApi.new
         when 'finish'
           FinishApi.new
+        when 'clear'
+          ClearApi.new
+        when 'observe'
+          ObserveApi.new
         else
           nil
       end

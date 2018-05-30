@@ -10,21 +10,54 @@ module Yamamoto
     def run(json_data)
 
       # リマインダーを取得する
-      day = json_data['options'] == 'today' ? Date.today : nil
+      result = nil
+      case json_data['options']['condition']
+        when 'today'
+          result = today_reminder_list(Date.today)
+        when 'all'
+          result = reminder_list
+        when 'unfinished'
+          result = unfinished_reminder_list
+      end
 
-      # JSON形式にフォーマットし文字列で返す
-      { list: reminder_list(day) }
+      result = add_finished_key(result)
+      { list: result }
     end
 
     private
 
     # リマインダーを取得する
+    # @return [Array]
+    def reminder_list
+      @data_accessor.all_read
+    end
+
+    # 指定された日付のリマインダーを取得する
     # @param day [Date] 日付
-    # @return [String]
-    def reminder_list(day)
-      data = @data_accessor.all_read
-      return data if day.nil?
+    # @return [Array]
+    def today_reminder_list(day)
+      data = reminder_list
       data.select {|d| Date.parse(d['notify_datetime']) == day}
+    end
+
+    # 完了していないリマインダーを取得する
+    # @return [Array]
+    def unfinished_reminder_list
+      data = reminder_list
+      data.select {|d| d['finished_at'].nil? }
+    end
+
+    # 完了かどうかのキーを追加する
+    # @param reminders [Array]
+    # @return [Array]
+    def add_finished_key(reminders)
+      reminders.each do |r|
+        if r['finished_at'].nil?
+          r['finished'] = false
+        else
+          r['finished'] = true
+        end
+      end
     end
   end
 end
