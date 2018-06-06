@@ -76,9 +76,13 @@ int reminder_element::select(sqlite::connection* conn, int id, reminder_element 
      notify_datetime = result->get_string(2);
      term = result->get_string(3);
      memo = result->get_string(4);
+     latitude = result->get_double(5);
+     longitude = result->get_double(6);
+     radius = result->get_double(7);
+     direction = result->get_string(8);
      finished_at = result->get_string(5);
      created_at = result->get_string(6);
- }
+}
 
  /*
  * @brief データ新規登録
@@ -338,7 +342,7 @@ void f_DspDetail(
     picojson::object&	req,
     picojson::object&	result
 ) {
-    int id = (int)req["options"].get<picojson::object>()["id"].get<double>();
+    int id = (int)req["options"].get<picojson::object>()["id"].get<double>();   
 
     reminder_element e;
     // 詳細データ取得

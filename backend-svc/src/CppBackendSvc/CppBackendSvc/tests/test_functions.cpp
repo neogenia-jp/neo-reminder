@@ -41,6 +41,10 @@ void InsertTestData(
 	elem.notify_datetime	= "2018-05-05T05:05:05+09:00";
 	elem.term				= "2018-05-05T05:05:05+09:00";
 	elem.memo				= "テストメモ１";
+    elem.latitude           = 34.663601;
+    elem.longitude          = 135.496921;
+    elem.radius             = 50;
+    elem.direction          = "long";
 	// finished(完了)フラグ = TRUEで完了データとする
 	if (finished) {
 		elem.finished_at = "2018-05-05T05:05:05+09:00";
@@ -51,17 +55,6 @@ void InsertTestData(
 
 	// データ投入
 	elem.save(conn);
-
-	//// 投入データ確認
-	//auto result = elem.select_all(conn);
-	//BOOST_CHECK_EQUAL(1, result.size());
-	//BOOST_CHECK_EQUAL(1, result[0].id);
-	//BOOST_CHECK_EQUAL("テストデータ１", result[0].title);
-	//BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", result[0].notify_datetime);
-	//BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", result[0].term);
-	//BOOST_CHECK_EQUAL("テストメモ１", result[0].memo);
-	//BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", result[0].finished_at);
-	//// BOOST_CHECK_EQUAL("", result[0].created_at);		// TODO:時刻
 }
 
 /*
@@ -84,6 +77,10 @@ BOOST_AUTO_TEST_CASE(select)
 	BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", elem.notify_datetime);
 	BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", elem.term);
 	BOOST_CHECK_EQUAL("テストメモ１", elem.memo);
+    BOOST_CHECK_EQUAL(34.663601, elem.latitude);
+    BOOST_CHECK_EQUAL(135.496921, elem.longitude);
+    BOOST_CHECK_EQUAL(50, elem.radius);
+    BOOST_CHECK_EQUAL("out", elem.direction);
 	BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", elem.finished_at);
 	// BOOST_CHECK_EQUAL("", result[0].created_at);		// TODO:時刻
 }

@@ -113,9 +113,13 @@ struct reminder_element : base_model {
     string notify_datetime; // g2018 - 03 - 20T19:32 : 00 + 0900h
     string term; //g2018 - 03 - 20T19:32 : 00 + 0900h,  // ISOŒ`®
     string memo; //gxxxxxxxxxxxxxxxxxxxxxxxh,
+    string latitude;  //  34.663601,   // ˆÜ“x
+    string longitude; // 135.496921,  // Œo“x
+    string radius;    // 50,         // ”¼Œai’PˆÊ‚Íƒ[ƒgƒ‹j
+    string direction; // gouth,  // in:”ÍˆÍ‚É“ü‚Á‚½‚Æ‚«  out:”ÍˆÍ‚©‚ço‚½‚Æ‚«
     string finished_at; // g2018-03-20T19:32:00+0900h,  // Š®—¹“ú
     string created_at; // g2018-03-20T19:32:00+0900h  // ì¬“ú
-
+                    
     static std::vector<reminder_element> select_all(sqlite::connection* conn, std::vector<string> condition) {
 		std::vector<string> v = { "1=1" };
 
