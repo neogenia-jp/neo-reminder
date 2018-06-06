@@ -44,7 +44,7 @@ void InsertTestData(
     elem.latitude           = 34.663601;
     elem.longitude          = 135.496921;
     elem.radius             = 50;
-    elem.direction          = "long";
+    elem.direction          = "out";
 	// finished(完了)フラグ = TRUEで完了データとする
 	if (finished) {
 		elem.finished_at = "2018-05-05T05:05:05+09:00";
@@ -172,6 +172,10 @@ BOOST_AUTO_TEST_CASE(update)
 	elem.notify_datetime	= "2018-05-05T05:05:05+09:00";
 	elem.term				= "2018-05-05T05:05:05+09:00";
 	elem.memo				= "テストメモ";
+    elem.latitude           = 33.3333;
+    elem.longitude          = 55.5555;
+    elem.radius             = 100;
+    elem.direction          = "in";
 	elem.finished_at		= "2018-05-05T05:05:05+09:00";
 	
 	// 更新実行
@@ -184,6 +188,10 @@ BOOST_AUTO_TEST_CASE(update)
 	BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", result[0].notify_datetime);
 	BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", result[0].term);
 	BOOST_CHECK_EQUAL("テストメモ", result[0].memo);
+    BOOST_CHECK_EQUAL(33.3333, result[0].latitude);
+    BOOST_CHECK_EQUAL(55.5555, result[0].longitude);
+    BOOST_CHECK_EQUAL(100, result[0].radius);
+    BOOST_CHECK_EQUAL("in", result[0].direction);
 	BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", result[0].finished_at);
 }
 
