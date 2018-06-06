@@ -47,17 +47,21 @@ class ApiController < ApplicationController
     }
 
     result = _call_backend input_data
-    #result = {
+    # result = {
     #  output: {
     #    id: 1,
     #    title: 'テスト',
     #    notify_datetime: '2018-03-29T19:32:00+0900',
     #    term: '2018-03-29T19:32:00+0900',
+    #    lat: 34.0,
+    #    long: 135.0,
+    #    radius: 50,
+    #    direction: 'out',
     #    created_at: '2018-03-29T19:32:00+0900',
     #    finished_at: '2018-03-29T19:32:00+0900',
     #    memo: 'めもめお'
     #  }.to_json
-    #}
+    # }
     render json: result
   end
 
@@ -69,7 +73,11 @@ class ApiController < ApplicationController
         title: params['title'],
         notify_datetime: params['notify_datetime'],
         term: params['term'],
-        memo: params['memo']
+        memo: params['memo'],
+        lat: params['lat']&.to_f,
+        long: params['long']&.to_f,
+        radius: params['radius']&.to_i,
+        direction: params['dir'],
       }
     }
 
