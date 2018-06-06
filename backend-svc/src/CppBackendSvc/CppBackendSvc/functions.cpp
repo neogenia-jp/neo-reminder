@@ -93,11 +93,11 @@ int reminder_element::select(sqlite::connection* conn, int id, reminder_element 
  int reminder_element::save(sqlite::connection* conn) {
  	try {
  		// INSERT SQL を作る
- 		auto sql = "INSERT INTO reminder_element VALUES (?, ?, ?, ?, ?, ?, ?)" ;
+ 		auto sql = "INSERT INTO reminder_element VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)" ;
  		// SQL を実行する
  		sqlite::execute ins(*conn, sql);
 
- 		ins % sqlite::nil % title % notify_datetime % term % memo % finished_at % created_at;
+ 		ins % sqlite::nil % title % notify_datetime % term % memo % latitude % longitude % radius % direction % finished_at % created_at;
  		ins();
  	}
  	catch (std::exception const & e) {
@@ -116,11 +116,11 @@ int reminder_element::select(sqlite::connection* conn, int id, reminder_element 
  int reminder_element::update(sqlite::connection* conn) {
      try {
          // INSERT SQL を作る
-         auto sql = "UPDATE reminder_element SET title=?, notify_datetime=?, term=?, memo=?, finished_at=?, created_at=? WHERE id=?";
+         auto sql = "UPDATE reminder_element SET title=?, notify_datetime=?, term=?, memo=?, lat=?, long=?, radius=?, direction=?, finished_at=?, created_at=? WHERE id=?";
          // SQL を実行する
          sqlite::execute upd(*conn, sql);
 
-         upd % title % notify_datetime % term % memo % finished_at % created_at % id;
+         upd % title % notify_datetime % term % memo %latitude % longitude % radius % direction % finished_at % created_at % id;
          upd();
      }
      catch (std::exception const & e) {
@@ -334,8 +334,6 @@ void f_Regist(
 	result = obj1;
 }
 
-
-
 // 詳細表示
 void f_DspDetail(
     sqlite::connection* conn,
@@ -383,6 +381,10 @@ void f_EditDetail(
     elem.notify_datetime    = req["options"].get<picojson::object>()["notify_datetime"].get<string>();
     elem.term			    = req["options"].get<picojson::object>()["term"].get<string>();
     elem.memo               = req["options"].get<picojson::object>()["memo"].get<string>();
+    elem.latitude           = req["options"].get<picojson::object>()["lat"].get<double>();
+    elem.longitude          = req["options"].get<picojson::object>()["long"].get<double>();
+    elem.radius             = (int)req["options"].get<picojson::object>()["radius"].get<double>();
+    elem.direction          = req["options"].get<picojson::object>()["direction"].get<string>();
     elem.created_at         = f_GetTime();
 
     // DB登録
