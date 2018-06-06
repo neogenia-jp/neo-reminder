@@ -38,7 +38,7 @@ if [ "$DEBUG" = "manual" ] ; then
 fi
 
 echo "start bundle install"
-su www-data -c 'bundle install -j$(nproc)'
+su www-data -c 'HOME=/var/rails bundle install -j$(nproc)'
 if [ $? -ne 0 ]; then
   echo "##### ERROR ##### failed bundle install"
   exit 4
