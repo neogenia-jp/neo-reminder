@@ -1,4 +1,4 @@
-﻿#include <boost/test/unit_test.hpp>
+#include <boost/test/unit_test.hpp>
 #include "../main.h"
 
 
@@ -223,5 +223,41 @@ BOOST_AUTO_TEST_CASE(finish)
 	BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", result[0].finished_at);
 	// BOOST_CHECK_EQUAL("", result[0].created_at);		// TODO:時刻
 }
+/*
+* @brief observeテスト
+*/
+BOOST_AUTO_TEST_CASE(observe)
+{
+    auto conn = init_db("test");
+    reminder_element elem;
+
+    // 対象データ有りテスト-------------------------------------
+
+    // （未完了）テストデータ登録
+    InsertTestData(conn, elem, 1, false);
+
+    // 通知される日時 
+    elem.current_time = "2018-05-05T05:05:05+09:00";
+
+    // observe実行
+    auto targetIDs = elem.observe(conn);
+
+    // observeより取得されたIDを検証
+    BOOST_CHECK_EQUAL(1, targetIDs.size());
+    BOOST_CHECK_EQUAL(1, targetIDs[0]);
+   
+    // 対象データなしテスト-------------------------------------
+
+    // 通知される日時 
+    elem.current_time = "2018-01-01T01:01:01+09:00";
+
+    // observe実行
+    auto targetIDs = elem.observe(conn);
+
+    // observeより取得されたIDを検証
+    BOOST_CHECK_EQUAL(0, targetIDs.size());
+}
+
+
 
 BOOST_AUTO_TEST_SUITE_END()
