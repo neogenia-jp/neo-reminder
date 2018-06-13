@@ -29,7 +29,7 @@ module Yoneoka
     # 新規作成
     # @param contents [Hash] ファイルに書き込む内容
     # @param id [Integer] ファイルID（指定しない場合は次のIDを採番する）
-    # @return [Integer] 書き込んだバイト数
+    # @return [Integer] iso8601形式の作成日付
     def create(contents, id=nil)
       # IDがファイル名と二重管理になるため、消しておく
       contents.delete_if {|key, val| key == :id || key == 'id'}
@@ -37,10 +37,13 @@ module Yoneoka
       id = next_id unless id
 
       # 作成日付を追加
-      contents['created_at'] = Time.now.iso8601
+      nowtime = Time.now.iso8601
+      contents['created_at'] = nowtime
 
       # TODO: ファイルの存在確認
       File.write(File.join(@data_base_path, "#{id}.json"), contents.to_json)
+
+      nowtime
     end
 
     # 更新

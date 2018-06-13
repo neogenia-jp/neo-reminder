@@ -13,9 +13,8 @@ module Yoneoka
 
     # 実行
     begin
-      result.merge(api.run(json_data).to_json)
+      result.merge!(api.run(json_data))
       result[:status] = 'ok'
-      result[:message] = ''
     rescue => e
       result[:status] = 'error'
       result[:message] = e.message
@@ -23,6 +22,8 @@ module Yoneoka
       result[:file] = e.backtrace #TODO file lineを正規表現で分割
       result[:line] = e.backtrace
     end
+
+    return result.to_json
   end
 end
 
