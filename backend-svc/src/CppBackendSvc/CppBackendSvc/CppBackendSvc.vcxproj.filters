@@ -20,6 +20,7 @@
     <ClCompile Include="db_tool\migrator.cpp">
       <Filter>db_tool</Filter>
     </ClCompile>
+    <ClCompile Include="Error_proc.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="main.h" />
@@ -27,6 +28,7 @@
     <ClInclude Include="db_tool\migrator.h">
       <Filter>db_tool</Filter>
     </ClInclude>
+    <ClInclude Include="Error_proc.h" />
   </ItemGroup>
   <ItemGroup>
     <Filter Include="tests">

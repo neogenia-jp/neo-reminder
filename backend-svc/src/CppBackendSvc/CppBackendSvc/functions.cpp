@@ -231,6 +231,18 @@ int reminder_element::select(sqlite::connection* conn, int id, reminder_element 
      return ClearedID;
  }
 
+ /*
+ * @brief observe
+ * @param (conn) DB Connection オブジェクト
+ * @return 0:削除成功
+ * @return 1:削除エラー
+ */
+ vector<int> reminder_element::observe(sqlite::connection* conn, string option) {
+
+
+     
+ }
+
 // 一覧取得
 void f_GetList(
     sqlite::connection* conn,
@@ -515,4 +527,35 @@ void f_Clear(
     obj1.insert(std::make_pair("status", picojson::value(status)));
 
     result = obj1;
+}
+
+// observe
+void f_Observe(
+    sqlite::connection* conn,
+    picojson::object&	req,
+    picojson::object&	result
+){
+    reminder_element elem;
+    // option取得
+    string current_time = req["options"].get<picojson::object>()["current_time"].get<string>();
+    string latitude = req["options"].get<picojson::object>()["latitude"].get<string>();
+    string longitude = req["options"].get<picojson::object>()["longitude"].get<string>();
+
+    // DB登録
+    int resultDB = elem.observe(conn);
+
+
+
+    //{
+    //command: “observe”,
+    //    options : {
+    //current_time: “2018 - 03 - 20T19 : 32 : 00 + 0900”,  // ISO形式
+    //    lat: 34.663601,      // 緯度
+    //    long : 135.496921,  // 経度
+    //}
+    //}
+
+
+
+
 }

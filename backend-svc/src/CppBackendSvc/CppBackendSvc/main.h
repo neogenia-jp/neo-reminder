@@ -25,6 +25,7 @@ enum CommandType {
 	finish,		// 完了
 	delet,		// 削除
     clear,      // クリア
+    observe,    // observe
 
 	command_maxnum // 最大コマンド数
 };
@@ -196,6 +197,19 @@ struct reminder_element : base_model {
     * @return 1:削除エラー
     */
     vector<int> clear(sqlite::connection* conn, string option);
+
+    /*
+    * @brief observe
+    * @param (conn) DB Connection オブジェクト
+    * @return 0:削除成功
+    * @return 1:削除エラー
+    */
+    vector<int> observe(sqlite::connection* conn) {
+
+
+
+
+    }
 };
 
 
@@ -263,7 +277,7 @@ DEF_API("edit", f_EditDetail);
 DEF_API("finish", f_Finish);
 DEF_API("delete", f_Delete);
 DEF_API("clear", f_Clear);
-
+DEF_API("observe", f_Observe);
 
 // 一覧取得
 //void f_GetList(
@@ -272,7 +286,6 @@ DEF_API("clear", f_Clear);
 //	picojson::object&	result
 //);
 //static FuncRegestorer dmy1("list", f_GetList);
-
 
 //
 //// 登録
