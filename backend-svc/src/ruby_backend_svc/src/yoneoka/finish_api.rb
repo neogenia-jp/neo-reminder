@@ -13,10 +13,8 @@ module Yoneoka
       time = Time.now.iso8601
       remindar['finished_at'] = time
 
-      result = {}
       @data_accessor.update(remindar, json_data['options']['id'])
-      result[:finished_at] = time
-      result
+      {finished_at: time}
     end
   end
 end

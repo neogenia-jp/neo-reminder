@@ -13,8 +13,8 @@ module Yoneoka
 
     # 実行
     begin
-      result.merge!(api.run(json_data))
       result[:status] = 'ok'
+      result.merge!(api.run(json_data))
     rescue => e
       result[:status] = 'error'
       result[:message] = e.message
@@ -26,4 +26,3 @@ module Yoneoka
     return result.to_json
   end
 end
-

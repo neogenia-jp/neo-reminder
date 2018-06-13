@@ -8,23 +8,12 @@ module Yoneoka
     # @return [Hash]
     def run(json_data)
 
-      result = {}
-
-      begin
-        notifications = []
-        @data_accessor.all_read.each do |item|
-          next unless (is_notify_target(item, json_data['options']))
-          notifications.push({subject: item['title'], body: item['memo']})
-        end
-        result[:status] = 'ok'
-        result[:message] = ''
-        result[:notifications] = notifications
-      rescue => e
-        result[:status] = 'error'
-        result[:message] = e.message
+      notifications = []
+      @data_accessor.all_read.each do |item|
+        next unless (is_notify_target(item, json_data['options']))
+        notifications.push({subject: item['title'], body: item['memo']})
       end
-      result
-
+      {notifications: notifications}
 
     end
 

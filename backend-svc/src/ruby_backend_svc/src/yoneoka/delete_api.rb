@@ -8,16 +8,7 @@ module Yoneoka
     # @return [Hash]
     def run(json_data)
       # リマインダーを完了する
-      result = {}
-      begin
-        @data_accessor.delete(json_data['options']['id'])
-        result[:status] = 'ok'
-        result[:message] = ''
-      rescue => e
-        result[:status] = 'error'
-        result[:message] = e.message
-      end
-      result
+      @data_accessor.delete(json_data['options']['id'])
     end
   end
 end
