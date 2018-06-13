@@ -57,6 +57,15 @@
             <input class="form-control" v-model="element.notify_datetime" placeholder="ISO形式" type="datatime">
           </div>
           <div class="form-group">
+            <label>通知場所</label>
+            <div class="input-group">
+              <input class="form-control" v-model="place" readonly="readonly">
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default" @click="onClickMap(this)">マップ表示</button>
+              </div>
+            </div>
+          </div>
+          <div class="form-group">
             <label>期限</label>
             <input class="form-control" v-model="element.term" placeholder="ISO形式">
           </div>
@@ -68,15 +77,12 @@
             <label>完了日時</label>
             <input class="form-control" v-model="element.finished_at" placeholder="ISO形式">
           </div>
-          <div class="form-group">
-            <label>作成日時</label>
-            <input class="form-control" v-model="element.created_at" placeholder="ISO形式">
-          </div>
         </form>
       </div>
       <div class="modal-footer" style="border-top: 1px solid #d8d8d8;">
         <p class="pull-left">
           ID: {{ element.id }}
+          created_at: {{ element.created_at }}
         </p>
         <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
         <button type="button" class="btn btn-primary" v-on:click="onClickSave(this)" data-loading-text="loading...">反映</button>
@@ -84,6 +90,56 @@
     </div>
   </div>
 </div>
+
+  <div id="google_map_modal" class="modal fade">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gmaps.js/0.4.25/gmaps.min.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js"></script>
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header" style="border-bottom: 1px solid #d8d8d8;">
+          <h3>通知場所を指定</h3>
+        </div>
+        <div class="modal-body">
+          <div class="input-group" style="margin-bottom: 12px; width: 80%; max-width: 380px">
+            <input class="form-control" id="search_word" placeholder="地図を検索">
+            <div class="input-group-btn">
+              <button type="button" class="btn btn-success" onclick="searchOnMap($('#search_word').val())">検索</button>
+            </div>
+          </div>
+
+          <div id="map" style="position: relative; overflow: hidden;"></div>
+        </div>
+        <div class="modal-footer" style="border-top: 1px solid #d8d8d8;">
+          <span class="pull-left" style="font-size: 90%; text-align: left">
+            緯度: <span id="map_lat"></span><br />
+            経度: <span id="map_lng"></span>
+          </span>
+          <div class="pull-left" style="margin-left: 8px">
+            <div class="input-group" style="width: 22em">
+              <span class="input-group-addon">半径</span>
+              <input class="form-control" id="map_radius" placeholder="地図を検索" maxlength="3" style="text-align: right">
+              <span class="input-group-addon">メートル</span>
+
+              <div class="input-group-btn">
+                <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <span id="map_direction_label">から出たとき</span>
+                  <span class="caret"></span>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-right">
+                  <li><a href="#" onclick="setDirection('out')">から出たとき</a></li>
+                  <li><a href="#" onclick="setDirection('in')">に入ったとき</a></li>
+                </ul>
+              </div><!-- /btn-group -->
+            </div>
+          </div>
+          <button type="button" class="btn btn-default" data-dismiss="modal">閉じる</button>
+          <button type="button" class="btn btn-primary" data-dismiss="modal" onclick="onMapSelected(this)">決定</button>
+
+          <input type="hidden" id="map_direction" value="out">
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script type="text/javascript">
@@ -196,6 +252,17 @@
       element: {},  // view model
       loading: true,
     },
+    computed: {
+      place: function() {
+        if (this.element.lat > 0) {
+          return '' + this.element.lat.toFixed(6)
+            + ' / ' + this.element.long.toFixed(6)
+            + ' 半径' + this.element.radius + 'm '
+            + (this.element.direction == 'in' ? 'に入ったとき' : 'から出たとき');
+        }
+        return '';
+      }
+    },
     created: function() {
     },
     methods: {
@@ -203,10 +270,110 @@
         callApiDetail(this, id);
         $('#element_details').modal('show');
       },
+      onClickMap: function(obj) {
+        $('#google_map_modal').modal('show');
+        showMap(this.element.lat, this.element.long, this.element.radius, this.element.direction);
+      },
       onClickSave: function(obj) {
         $(obj).button('loading');
         callApiEdit(this);
       }
     }
   });
+
+  function onMapSelected(obj) {
+    vm2.element.lat = parseFloat($('#map_lat').text());
+    vm2.element.long = parseFloat($('#map_lng').text());
+    vm2.element.radius = parseInt($('#map_radius').val());
+    vm2.element.direction = $('#map_direction').val();
+  }
+
+  // ----- gmap.js ------------------------------------------------------------
+  // http://hpneo.github.io/gmaps/documentation.html#GMaps-removeMarkers
+  var map;
+
+  // Update center
+  $(document).on('click', '.pan-to-marker', function(e) {
+      e.preventDefault();
+
+      var lat, lng;
+
+      var $index = $(this).data('marker-index');
+      var $lat = $(this).data('marker-lat');
+      var $lng = $(this).data('marker-lng');
+
+      if ($index != undefined) {
+          // using indices
+          var position = map.markers[$index].getPosition();
+          lat = position.lat();
+          lng = position.lng();
+      }
+      else {
+          // using coordinates
+          lat = $lat;
+          lng = $lng;
+      }
+
+      map.setCenter(lat, lng);
+  });
+
+  function showMap(lat, lng, radius, dir){
+      lat = lat || 34.663601;
+      lng = lng || 135.496921;
+      radius = radius || 50;
+      setDirection(dir);
+
+      map = new GMaps({
+          div: '#map',
+          lat: lat,
+          lng: lng,
+          width: '100%',  // なぜかここで指定しないと 0 で設定されてしまう。
+          height: '55vh'
+      });
+      setMarker(lat, lng);
+
+      GMaps.on('click', map.map, function(event) {
+
+          var index = map.markers.length;
+          var lat = event.latLng.lat();
+          var lng = event.latLng.lng();
+
+          var template = $('#edit_marker_template').text();
+
+          setMarker(lat, lng);
+      });
+
+      $('#map_radius').val(radius);
+  }
+
+  function setMarker(lat, lng) {
+      lat = lat.toFixed(6);
+      lng = lng.toFixed(6);
+      map.removeMarkers();
+      map.addMarker({
+          lat: lat,
+          lng: lng,
+          title: 'Marker',
+      });
+      map.setCenter(lat, lng);
+      $('#map_lat').text(lat);
+      $('#map_lng').text(lng);
+  }
+
+  function searchOnMap(word) {
+      GMaps.geocode({
+          address: word,
+          callback: function(results, status) {
+              if (status == 'OK') {
+                  var latlng = results[0].geometry.location;
+                  setMarker(latlng.lat(), latlng.lng());
+              }
+          }
+      });
+  }
+
+  function setDirection(dir) {
+      $('#map_direction').val(dir);
+      $('#map_direction_label').text(dir == 'out' ? 'から出たとき' : 'に入ったとき');
+  }
 </script>
