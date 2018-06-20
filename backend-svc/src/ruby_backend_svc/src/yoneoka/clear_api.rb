@@ -20,5 +20,9 @@ module Yoneoka
       {affected_id_list: affected_id_list}
 
     end
+
+    def hoge
+      puts 'hogehoge'
+    end
   end
 end
