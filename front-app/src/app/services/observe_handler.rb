@@ -6,12 +6,21 @@ class ObserveHandler < BaseService
   end
 
   def exec(time=nil)
+    # Redisよりルートごとの位置情報を取り出す
+    key = LocationController._build_cache_key('location', @route)
+    location = JSON.parse Redis.current.get(key)
+    if location.present?
+      logger.info "route=#{@route} location=[#{location['lat']}, #{location['lng']}] at #{Time.at location['client_time']}"
+    else
+      logger.info "route=#{@route} no location info."
+    end
+
     input_data = {
       command: 'observe',
       options: {
         current_time: time||Time.now.iso8601,
-        lat: 0.0,  # 緯度：TODO
-        long: 0.0  # 経度：TODO
+        lat: location['lat'],  # 緯度
+        long: location['lng']  # 経度
       }
     }
 
