@@ -267,6 +267,7 @@ DEPENDENCIES
   rack-mini-profiler
   rack-user_agent (~> 0.5.2)
   rails (= 5.0.6)
+  redis
   redis-rack (~> 2.0.2)
   redis-rails
   redis-store (~> 1.4.0)
