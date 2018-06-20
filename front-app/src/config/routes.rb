@@ -14,6 +14,8 @@ Rails.application.routes.draw do
   post 'api/finish', to: 'api#finish'
   post 'api/delete', to: 'api#delete'
 
+  post 'location/moved', to: 'location#moved'
+
   # どこにも当てはまらない場合
   get '*path', to: 'application#render_404'
 end
