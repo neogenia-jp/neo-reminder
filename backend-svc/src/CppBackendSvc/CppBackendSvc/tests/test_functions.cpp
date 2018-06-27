@@ -255,7 +255,9 @@ BOOST_AUTO_TEST_CASE(observe)
     auto targetIDs = elem.observe(conn);
 
     // observeより取得されたIDを検証
-    BOOST_CHECK_EQUAL(0, targetIDs.size());
+    // TODO:何の処理して検証したいか決める
+
+    // BOOST_CHECK_EQUAL(0, targetIDs.size());
 }
 
 

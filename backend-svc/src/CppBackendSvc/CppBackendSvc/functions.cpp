@@ -12,13 +12,6 @@ using namespace std;
 
 vector<FUNC_ENTRY> FUNC_TABLE;
 
-// 条件定義
-#define _ALL              0     // 全て
-#define _FINISHED         1     // 未完了
-#define _UNFINISHED       2     // 完了
-#define _TODAY            3     // 今日
-#define _CONDITION        4     // その他条件付き
-
 //-----------------------------------------------------------------------------
 // reminder_elelment functions
 //-----------------------------------------------------------------------------
@@ -54,7 +47,7 @@ vector<FUNC_ENTRY> FUNC_TABLE;
  * @param (conn) DB Connection オブジェクト
  */
 int reminder_element::select(sqlite::connection* conn, int id, reminder_element &e) {
-     // INSERT SQL を作る
+     // SELECT SQL を作る
      string sql = "SELECT * FROM reminder_element WHERE id = ";
      sql += to_string(id);
 
@@ -71,17 +64,18 @@ int reminder_element::select(sqlite::connection* conn, int id, reminder_element 
  }
 
  void reminder_element::load(boost::shared_ptr<sqlite::result> result) {
-     id = result->get_int(0);
-     title = result->get_string(1);
-     notify_datetime = result->get_string(2);
-     term = result->get_string(3);
-     memo = result->get_string(4);
-     latitude = result->get_double(5);
-     longitude = result->get_double(6);
-     radius = result->get_double(7);
-     direction = result->get_string(8);
-     finished_at = result->get_string(5);
-     created_at = result->get_string(6);
+     id = result->get_int(0);                   // ID
+     title = result->get_string(1);             // title
+     notify_datetime = result->get_string(2);   // notify_datetime
+     term = result->get_string(3);              // term
+     memo = result->get_string(4);              // memo
+     finished_at = result->get_string(5);       // finished_at
+     created_at = result->get_string(6);        // created_at
+     latitude = result->get_double(7);          // lat
+     longitude = result->get_double(8);         // long
+     radius = result->get_int(9);               // radius
+     direction = result->get_string(10);        // direction
+     current_time = result->get_string(11);     // current_time
 }
 
  /*
@@ -231,17 +225,94 @@ int reminder_element::select(sqlite::connection* conn, int id, reminder_element 
      return ClearedID;
  }
 
+
+#define earth_r 6378.137                // 地球の半径（km）
+#define PI 3.141592653589793            // 円周率
+#define deg2rad(a) ((a)/180.0 * M_PI)   // 角度をラジアン変換するマクロ
+
+ /*
+ * @brief ２地点間の距離を計測する
+ * @param (lat1) 緯度1
+ * @param (lng1) 経度1
+ * @param (lat2) 緯度2
+ * @param (lng2) 経度2
+ * @return (double) ２地点間の距離
+ */
+  double MeasureDist(double lat1, double lng1, double lat2, double lng2) {
+      double lat = deg2rad(lat2 - lat1);
+      double lng = deg2rad(lng2 - lng1);
+      double NSD = earth_r * lat;
+      double EWD = cos(deg2rad(lat1))*earth_r*lng;
+      double distance = sqrt(pow(NSD, 2) + pow(EWD, 2));
+      
+      // マイナスの場合、符号反転
+      if (distance < 0) distance = -distance;
+
+      return distance;
+ }
+
+  /*
+  * @brief 現在値が設定値圏内かどうか調べる
+  * @param (locLat) 緯度（現在地）
+  * @param (locLng) 経度（現在地）
+  * @param (setLat) 緯度（設定値）
+  * @param (setLng) 経度（設定値）
+  * @param (radius) 通知範囲（設定値）
+  * @return 
+  */
+  bool IsInRange(double locLat, double locLng, double setLat, double setLng, int radius) {
+      double distance = MeasureDist(locLat, locLng, setLat, setLng);
+      // 範囲内だったらtrue
+      if (distance <= radius) return true;
+
+      return false;
+  }
+
  /*
  * @brief observe
  * @param (conn) DB Connection オブジェクト
  * @return 0:削除成功
  * @return 1:削除エラー
  */
- vector<int> reminder_element::observe(sqlite::connection* conn, string option) {
-
-
+ OBSERVE_ST reminder_element::observe(sqlite::connection* conn) {
      
+     OBSERVE_ST list;           // 結果リスト
+     list.status = _SUCCESS;    // 処理結果ステータス
+     
+     try {
+         // 緯度・経度がNULLもしくは空でないデータの取得
+         string sql = "SELECT * FROM reminder_element WHERE 1 = 1 AND lat IS NOT NULL AND lat <> '' AND long IS NOT NULL AND long <> ''";
+
+         sqlite::query q(*conn, sql);
+         boost::shared_ptr<sqlite::result> result = q.get_result();
+
+         // HITしたデータの情報を格納する
+
+         while (result->next_row()) {
+             double setLat = result->get_double(7);
+             double setLng = result->get_double(8);
+             int radius = result->get_int(9);
+
+             if (IsInRange(latitude, longitude, setLat, setLng, radius))
+             {
+                 // 設定圏内で有ればデータ格納
+                 OBSERVE_DATA OBSERVE_ST;
+                 OBSERVE_ST.subject = "設定圏内に入りました";
+                 OBSERVE_ST.body = "通知 ID:" + result->get_int(0);
+                 OBSERVE_ST.svc_data = "なんじゃのかんじゃの";
+
+                 list.observe_st.push_back(OBSERVE_ST);
+             }
+         }
+
+     }
+     catch (std::exception const & e) {
+         list.status = _ERROR;
+     }
+
+     return list;
  }
+ 
 
 // 一覧取得
 void f_GetList(
@@ -521,13 +592,15 @@ void f_Clear(
     for (int x : resultDB) {
         picoArray.push_back(picojson::value((double)x));
     }
-
+    
     obj1.insert(std::make_pair("affected_id_list", picojson::value(picoArray)));
     obj1.insert(std::make_pair("message", picojson::value(message)));
     obj1.insert(std::make_pair("status", picojson::value(status)));
 
     result = obj1;
 }
+
+
 
 // observe
 void f_Observe(
@@ -536,26 +609,29 @@ void f_Observe(
     picojson::object&	result
 ){
     reminder_element elem;
+    
     // option取得
-    string current_time = req["options"].get<picojson::object>()["current_time"].get<string>();
-    string latitude = req["options"].get<picojson::object>()["latitude"].get<string>();
-    string longitude = req["options"].get<picojson::object>()["longitude"].get<string>();
-
-    // DB登録
-    int resultDB = elem.observe(conn);
-
-
-
-    //{
-    //command: “observe”,
-    //    options : {
-    //current_time: “2018 - 03 - 20T19 : 32 : 00 + 0900”,  // ISO形式
-    //    lat: 34.663601,      // 緯度
-    //    long : 135.496921,  // 経度
-    //}
-    //}
+    elem.current_time = req["options"].get<picojson::object>()["current_time"].get<string>();
+    // 2018-03-20T19:32:00+0900
+    // string current_time = time.erase(20);
+    elem.latitude = req["options"].get<picojson::object>()["lat"].get<double>();
+    elem.longitude = req["options"].get<picojson::object>()["long"].get<double>();
+    
+    // データ処理
+    auto resultData = elem.observe(conn);
+    
 
 
 
+    if ((double)resultData.status == _ERROR){
+        // 共通エラー処理
+       // return error_proc(observe, result);
+    }
 
+    // picojsonオブジェクト
+    picojson::object obj;
+    obj.insert(std::make_pair("message", picojson::value(resultData.message)));
+    obj.insert(std::make_pair("status", picojson::value((double)resultData.status)));
+
+    result = obj;
 }
