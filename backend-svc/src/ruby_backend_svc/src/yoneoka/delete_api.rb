@@ -9,6 +9,7 @@ module Yoneoka
     def run(json_data)
       # リマインダーを完了する
       @data_accessor.delete(json_data['options']['id'])
+      {}
     end
   end
 end
