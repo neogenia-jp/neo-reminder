@@ -1,6 +1,6 @@
 require_relative './base_model'
 
-module Yamamoto
+module Kamada
   class Remind < BaseModel
     define_attributes(
         :id,

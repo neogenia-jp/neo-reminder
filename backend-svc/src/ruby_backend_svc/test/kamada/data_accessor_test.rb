@@ -1,6 +1,6 @@
 require_relative './base_test'
 
-module Yamamoto
+module Kamada
   class DataAccessorTest < BaseTest
     def setup
       # ファイル作成

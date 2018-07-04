@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'fileutils'
 
-module Yamamoto
+module Kamada
   class BaseModelTest < Test::Unit::TestCase
     def setup
       DataAccessor.class_variable_set(:@@data_path, File.join(File.dirname(__FILE__), '../data'))

@@ -1,7 +1,7 @@
 require_relative './base_test'
 require 'pry'
 
-module Yamamoto
+module Kamada
   class ListApiTest < BaseTest
     def setup
       super

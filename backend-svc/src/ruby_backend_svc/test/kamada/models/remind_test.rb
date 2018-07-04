@@ -2,7 +2,7 @@ require 'test/unit'
 require_relative './base_model_test'
 require_relative '../../../src/yamamoto/models/remind'
 
-module Yamamoto
+module Kamada
   class RemindTest < BaseModelTest
     def test_initialize_初期値あり
       m = Remind.new

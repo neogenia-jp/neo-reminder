@@ -1,7 +1,7 @@
 require_relative './base_api'
 require 'time'
 
-module Yamamoto
+module Kamada
   class ObserveApi < BaseApi
 
     # 実行

@@ -1,6 +1,6 @@
 require_relative './base_test'
 
-module Yamamoto
+module Kamada
   class CreateApiTest < BaseTest
     def setup
       super
