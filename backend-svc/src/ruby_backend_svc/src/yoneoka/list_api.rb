@@ -22,7 +22,10 @@ module Yoneoka
     # @param day [Date] 日付
     # @return [String]
     def reminder_list(day)
-      data = @data_accessor.all_read
+      data = @data_accessor.all_read.each do |item|
+        item['finished'] = !!item['finished_at']
+      end
+
       return data if day.nil?
       data.select {|d| Date.parse(d['notify_datetime']) == day}
     end
