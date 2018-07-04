@@ -10,7 +10,7 @@ module Yoneoka
     def run(json_data)
 
       # リマインダーを取得する
-      day = json_data['options'] == 'today' ? Date.today : nil
+      day = json_data['options']['condition'] == 'today' ? Date.today : nil
 
       # JSON形式にフォーマットし文字列で返す
       { list: reminder_list(day) }

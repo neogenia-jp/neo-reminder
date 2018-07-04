@@ -13,18 +13,8 @@ module Yoneoka
       time = Time.now.iso8601
       remindar['finished_at'] = time
 
-      result = {}
-      begin
-        @data_accessor.update(remindar, json_data['options']['id'])
-        result[:status] = 'ok'
-        result[:message] = ''
-        result[:finished_at] = time
-      rescue => e
-        result[:status] = 'error'
-        result[:message] = e.message
-        result[:finished_at] = ''
-      end
-      result
+      @data_accessor.update(remindar, json_data['options']['id'])
+      {finished_at: time}
     end
   end
 end

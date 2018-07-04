@@ -6,6 +6,7 @@ require_relative './edit_api'
 require_relative './finish_api'
 require_relative './clear_api'
 require_relative './observe_api'
+require_relative './snooze_api'
 
 module Yoneoka
   class ApiFactory
@@ -28,6 +29,8 @@ module Yoneoka
           ClearApi.new
         when 'observe'
           ObserveApi.new
+        when 'snooze'
+          SnoozeApi.new
         else
           nil
       end
