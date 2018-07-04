@@ -25,9 +25,6 @@ class TestV1 < Test::Unit::TestCase
       raise "Service error.#{e}#{stdout}#{stderr}"
     end
 
-    # rebaseのときに消す
-    p result
-
     assert_not_equal '', result, 'No response of service!!!'
 
     JSON.parse(result, symbolize_names: true)
