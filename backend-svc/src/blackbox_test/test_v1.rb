@@ -77,7 +77,7 @@ class TestV1 < Test::Unit::TestCase
     result = _call_svc(json_data)
 
     assert_equal 'ok', result[:status]
-    assert is_iso_date(result[:created_at])
+    assert is_iso_date(result[:updated_at])
 
     # 一覧取得
     json_data = '{"command":"list","options":{"condition":"all"}}'
