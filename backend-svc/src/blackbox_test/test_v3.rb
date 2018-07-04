@@ -60,7 +60,7 @@ class TestV3 < Test::Unit::TestCase
         title:           'テストコードを書く',
         notify_datetime: '2018-03-20T17:00:00+09:00',
         term:            '2018-03-21T10:30:00+09:00',
-        memo:            '実装した新機能のテストコードがまだないので書く'
+        memo:            '実装した新機能のテストコードがまだないので書く',
         lat:             34.663601,
         long:            135.496921,
         radius:          50,
@@ -133,7 +133,7 @@ class TestV3 < Test::Unit::TestCase
         title:           '日本に電話する',
         notify_datetime: '2018-03-20T17:02:00+09:00',
         term:            '2018-03-21T10:30:00+09:00',
-        memo:            'ブラジルの人きこえますか〜'
+        memo:            'ブラジルの人きこえますか〜',
         lat:             -15.791726,
         long:            -47.889573,
         radius:          100,
@@ -350,7 +350,7 @@ class TestV3 < Test::Unit::TestCase
         title:           'テストコードを書く',
         notify_datetime: '2018-03-20T17:16:00+09:00',
         term:            '2018-03-21T10:30:00+09:00',
-        memo:            '実装した新機能のテストコードがまだないので書く'
+        memo:            '実装した新機能のテストコードがまだないので書く',
         lat:             34.663601,
         long:            135.496921,
         radius:          50,
