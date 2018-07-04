@@ -55,12 +55,15 @@ module Yoneoka
       contents.delete_if {|key, val| key == :id || key == 'id'}
 
       # 更新日付を追加
-      contents['updated_at'] = Time.now.iso8601
+      nowtime = Time.now.iso8601
+      contents['updated_at'] = nowtime
 
       # 更新対象に指定された値を更新する
       # TODO: ファイルの存在確認
       target = read(id)
       File.write(File.join(@data_base_path, "#{id}.json"), target.merge(contents).to_json)
+
+      nowtime
     end
 
     # 削除
