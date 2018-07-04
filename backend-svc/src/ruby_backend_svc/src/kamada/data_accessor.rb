@@ -5,9 +5,10 @@ require 'pry'
 
 module Kamada
   class DataAccessor
-    include Singleton
-    def initialize
-      @data_base_path = File.join(File.dirname(__FILE__), 'data')
+    @@data_path = File.join(File.dirname(__FILE__), 'data')
+    def initialize(model_dir_name=nil)
+      @data_base_path = @@data_path
+      @data_base_path = File.join(@data_base_path, model_dir_name) if model_dir_name
     end
 
     # データ読み込み
@@ -42,6 +43,8 @@ module Kamada
 
       # TODO: ファイルの存在確認
       File.write(File.join(@data_base_path, "#{id}.json"), contents.to_json)
+
+      read(id)
     end
 
     # 更新
@@ -59,6 +62,8 @@ module Kamada
       # TODO: ファイルの存在確認
       target = read(id)
       File.write(File.join(@data_base_path, "#{id}.json"), target.merge(contents).to_json)
+
+      read(id)
     end
 
     # 削除
@@ -66,28 +71,6 @@ module Kamada
     def delete(id)
       # TODO: ファイルの存在確認
       File.delete(File.join(@data_base_path, "#{id}.json"))
-    end
-
-    # まとめて削除
-    # @param target [String] 削除対象(all:全削除　finished:完了済みだけ削除)
-    # @return [Array] 削除したデータのidの配列
-    def clear(target)
-      if target == "all"
-        id_list.map {|id|
-          delete(id)
-          id
-        }
-      elsif target == "finished"
-        id_list.select {|id|
-          data = read(id)
-          if data["finished_at"].nil?
-            nil
-          else
-            delete(id)
-            id
-          end
-        }
-      end
     end
 
     # @param options [Hash]

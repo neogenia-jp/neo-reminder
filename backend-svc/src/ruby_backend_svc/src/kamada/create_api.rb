@@ -16,7 +16,7 @@ module Kamada
       rescue => e
         result[:status] = 'error'
         result[:message] = e.message
-        result[:created_at] = nil
+        result[:created_at] = ''
       end
 
       result

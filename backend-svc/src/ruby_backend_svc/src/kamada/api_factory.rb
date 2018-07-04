@@ -9,7 +9,6 @@ require_relative './clear_api'
 module Kamada
   class ApiFactory
     def self.get(command_name)
-      # TODO いちいちAPIに応じて書くのめんどい
       case command_name
         when 'list'
           ListApi.new
