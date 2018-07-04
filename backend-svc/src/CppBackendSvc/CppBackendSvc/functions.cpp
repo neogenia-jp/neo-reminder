@@ -281,19 +281,19 @@ int reminder_element::select(sqlite::connection* conn, int id, reminder_element 
      
      try {
          // 緯度・経度がNULLもしくは空でないデータの取得
-         string sql = "SELECT * FROM reminder_element WHERE 1 = 1 AND lat IS NOT NULL AND lat <> '' AND long IS NOT NULL AND long <> ''";
+         string sql = "SELECT * FROM reminder_element WHERE latitude IS NOT NULL ";
+
 
          sqlite::query q(*conn, sql);
          boost::shared_ptr<sqlite::result> result = q.get_result();
 
          // HITしたデータの情報を格納する
+         reminder_element e;
 
          while (result->next_row()) {
-             double setLat = result->get_double(7);
-             double setLng = result->get_double(8);
-             int radius = result->get_int(9);
+              e.load(result);
 
-             if (IsInRange(latitude, longitude, setLat, setLng, radius))
+             if (IsInRange(latitude, longitude, e.latitude, e.longitude, e.radius))
              {
                  // 設定圏内で有ればデータ格納
                  OBSERVE_DATA OBSERVE_ST;
@@ -307,7 +307,9 @@ int reminder_element::select(sqlite::connection* conn, int id, reminder_element 
 
      }
      catch (std::exception const & e) {
+         cout << e.what();
          list.status = _ERROR;
+
      }
 
      return list;
@@ -448,6 +450,62 @@ void f_DspDetail(
         obj1.insert(std::make_pair("finished_at", picojson::value(e.finished_at)));
     }
     result = obj1;
+}
+
+class JsonMenberDef {
+public:
+    string name;
+    string type;
+
+    JsonMenberDef(string name, string type) : name(name), type(type) {
+    }
+
+    static int RegistMember(vector<JsonMenberDef> defines, string name, string type) {
+        JsonMenberDef def(name, type);
+        defines.push_back(def);
+    }
+};
+
+#define JSON_DOUBLE(member_name) \
+  double member_name(){ return boost::get<double>(values[#member_name]); } \
+  void set_##member_name(double val){ values[#member_name] = val; } \
+  auto dmy##member_name = JsonMenberDef.RegistMember(this->defines, member_name, "double")
+
+
+#define JSON_STRING(member_name) string member_name(){ return boost::get<string>(values[#member_name]); }
+
+
+struct BASE_MESG {
+    vector<JsonMenberDef> defines;
+    map<string, boost::variant<int, double, string> > values;
+
+
+        void from_json(picojson::object req) {
+        for (auto def : defines) {
+            auto val = (int)req["options"].get<picojson::object>()[def.name];
+            if (def.type == "double") {
+                values[def.name] = val.get<double>();
+            }
+            else if (def.type == "string") {
+                values[def.name] = val.get<string>();
+            }
+        }
+    }
+};
+
+struct OVSERB_MESG : BASE_MESG {
+    JSON_DOUBLE(lat);
+    JSON_DOUBLE(lng);
+    JSON_STRING(current_time)
+};
+
+
+void f_Obseve2(picojson::object req) {
+    OVSERB_MESG msg;
+    msg.from_json(req);
+
+    auto lat = msg.lat();
+    msg.set_lat(136.0);
 }
 
 // 詳細編集
