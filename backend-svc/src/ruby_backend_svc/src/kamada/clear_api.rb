@@ -1,6 +1,6 @@
 require_relative './base_api'
 
-module Yamamoto
+module Kamada
   class ClearApi < BaseApi
 
     # 実行

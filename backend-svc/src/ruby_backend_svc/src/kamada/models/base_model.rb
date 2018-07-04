@@ -2,7 +2,7 @@ require 'json'
 require_relative '../data_accessor'
 require_relative '../extend/string_ext'
 
-module Yamamoto
+module Kamada
   class BaseModel
     attr_reader :new_record
 
