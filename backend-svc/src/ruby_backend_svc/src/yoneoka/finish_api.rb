@@ -9,11 +9,10 @@ module Yoneoka
     # @return [Hash]
     def run(json_data)
       # リマインダーを完了する
-      remindar = @data_accessor.read(json_data['options']['id'])
       time = Time.now.iso8601
-      remindar['finished_at'] = time
+      contents = {'finished_at': time}
 
-      @data_accessor.update(remindar, json_data['options']['id'])
+      @data_accessor.update(contents, json_data['options']['id'])
       {finished_at: time}
     end
   end

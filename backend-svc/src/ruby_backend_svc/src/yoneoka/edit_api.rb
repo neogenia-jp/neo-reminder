@@ -9,8 +9,7 @@ module Yoneoka
     def run(json_data)
       # リマインダーを更新する
       edit_id = json_data['options']['id']
-      @data_accessor.update(json_data['options'], edit_id)
-      {updated_at: @data_accessor.read(edit_id)['updated_at']}
+      {updated_at: @data_accessor.update(json_data['options'], edit_id) }
     end
   end
 end
