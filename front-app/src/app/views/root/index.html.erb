@@ -28,9 +28,9 @@
   <template v-else>
     <ul class="list-group">
       <li class="list-group-item" v-for="element in list">
-          <div  v-on:click="onClickDetail(element.id)" class="reminder-element">
+          <div v-on:click="onClickDetail(element.id)" class="reminder-element">
             <span type="text">{{ element.title }}</span>
-            (<span>{{ element.term }}<span>)
+            (<span>{{ element.term }}</span>)
           </div>
       </li>
     </ul>
@@ -143,6 +143,22 @@
 </div>
 
 <script type="text/javascript">
+  GeoLocationUtil.onLocationMoved(function(l){
+      $.ajax({
+          type: "POST",
+          url: '/location/moved',
+          data: {
+              lat: l.lat(),
+              lng: l.lng(),
+              time: Date.now()/1000
+          },
+          success: function (response) {
+          },
+          error: function () {
+          }
+      });
+  });
+
   function callApiCreate(vm) {
     $.ajax({
       type: "POST",
