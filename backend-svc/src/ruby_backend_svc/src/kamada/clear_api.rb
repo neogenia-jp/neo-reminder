@@ -7,18 +7,47 @@ module Kamada
     # @param json_data [Hash] 送られてきたJSONデータ
     # @return [Hash]
     def run(json_data)
-      # リマインダーを削除する
-      result = {}
-      begin
-        list = @data_accessor.clear(json_data['options']['target'])
-        result[:status] = 'ok'
-        result[:message] = 'xxxxxxxxx'
-        result[:affected_id_list] = list
-      rescue => e
-        result[:status] = 'error'
-        result[:message] = e.message
+      options = json_data['options']
+      case options['target']
+        when 'all'
+          clear_all
+        when 'finished'
+          clear_finished
+        else
+          {
+              status: 'error',
+              message: "targetに不正な文字列が指定されました。target[#{options['target']}]",
+              affected_id_list: []
+          }
       end
-      result
+    end
+
+    def clear_all
+      affected_id_list = []
+      @data_accessor.all_read.each do |data|
+        @data_accessor.delete(data['id'])
+        affected_id_list << data['id']
+      end
+
+      {
+          status: 'ok',
+          message: '',
+          affected_id_list: affected_id_list
+      }
+    end
+
+    def clear_finished
+      affected_id_list = []
+      @data_accessor.all_read.select { |data| !data['finished_at'].nil? }.each do |data|
+        @data_accessor.delete(data['id'])
+        affected_id_list << data['id']
+      end
+
+      {
+          status: 'ok',
+          message: '',
+          affected_id_list: affected_id_list
+      }
     end
   end
 end
