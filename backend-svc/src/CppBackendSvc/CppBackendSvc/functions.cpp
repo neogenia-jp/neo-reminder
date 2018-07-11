@@ -281,8 +281,7 @@ int reminder_element::select(sqlite::connection* conn, int id, reminder_element 
      
      try {
          // 緯度・経度がNULLもしくは空でないデータの取得
-         string sql = "SELECT * FROM reminder_element WHERE latitude IS NOT NULL ";
-
+         string sql = "SELECT * FROM reminder_element WHERE 1 = 1 AND lat IS NOT NULL AND lat <> '' AND long IS NOT NULL AND long <> ''";
 
          sqlite::query q(*conn, sql);
          boost::shared_ptr<sqlite::result> result = q.get_result();
@@ -314,7 +313,55 @@ int reminder_element::select(sqlite::connection* conn, int id, reminder_element 
 
      return list;
  }
- 
+
+ /*
+ * @brief snooze
+ * @param (conn) DB Connection オブジェクト
+ * @return 0:削除成功
+ * @return 1:削除エラー
+ */
+ SNOOZE_ST reminder_element::snooze(sqlite::connection* conn) {
+
+     SNOOZE_ST list;           // 結果リスト
+     list.status = _SUCCESS;    // 処理結果ステータス
+
+
+
+
+     //try {
+     //    // 緯度・経度がNULLもしくは空でないデータの取得
+     //    string sql = "SELECT * FROM reminder_element WHERE 1 = 1 AND lat IS NOT NULL AND lat <> '' AND long IS NOT NULL AND long <> ''";
+
+     //    sqlite::query q(*conn, sql);
+     //    boost::shared_ptr<sqlite::result> result = q.get_result();
+
+     //    // HITしたデータの情報を格納する
+     //    reminder_element e;
+
+     //    while (result->next_row()) {
+     //        e.load(result);
+
+     //        if (IsInRange(latitude, longitude, e.latitude, e.longitude, e.radius))
+     //        {
+     //            // 設定圏内で有ればデータ格納
+     //            OBSERVE_DATA OBSERVE_ST;
+     //            OBSERVE_ST.subject = "設定圏内に入りました";
+     //            OBSERVE_ST.body = "通知 ID:" + result->get_int(0);
+     //            OBSERVE_ST.svc_data = "なんじゃのかんじゃの";
+
+     //            list.observe_st.push_back(OBSERVE_ST);
+     //        }
+     //    }
+
+     //}
+     //catch (std::exception const & e) {
+     //    cout << e.what();
+     //    list.status = _ERROR;
+
+     //}
+
+     return list;
+ }
 
 // 一覧取得
 void f_GetList(
@@ -451,62 +498,62 @@ void f_DspDetail(
     }
     result = obj1;
 }
-
-class JsonMenberDef {
-public:
-    string name;
-    string type;
-
-    JsonMenberDef(string name, string type) : name(name), type(type) {
-    }
-
-    static int RegistMember(vector<JsonMenberDef> defines, string name, string type) {
-        JsonMenberDef def(name, type);
-        defines.push_back(def);
-    }
-};
-
-#define JSON_DOUBLE(member_name) \
-  double member_name(){ return boost::get<double>(values[#member_name]); } \
-  void set_##member_name(double val){ values[#member_name] = val; } \
-  auto dmy##member_name = JsonMenberDef.RegistMember(this->defines, member_name, "double")
-
-
-#define JSON_STRING(member_name) string member_name(){ return boost::get<string>(values[#member_name]); }
-
-
-struct BASE_MESG {
-    vector<JsonMenberDef> defines;
-    map<string, boost::variant<int, double, string> > values;
-
-
-        void from_json(picojson::object req) {
-        for (auto def : defines) {
-            auto val = (int)req["options"].get<picojson::object>()[def.name];
-            if (def.type == "double") {
-                values[def.name] = val.get<double>();
-            }
-            else if (def.type == "string") {
-                values[def.name] = val.get<string>();
-            }
-        }
-    }
-};
-
-struct OVSERB_MESG : BASE_MESG {
-    JSON_DOUBLE(lat);
-    JSON_DOUBLE(lng);
-    JSON_STRING(current_time)
-};
-
-
-void f_Obseve2(picojson::object req) {
-    OVSERB_MESG msg;
-    msg.from_json(req);
-
-    auto lat = msg.lat();
-    msg.set_lat(136.0);
-}
+//
+//class JsonMenberDef {
+//public:
+//    string name;
+//    string type;
+//
+//    JsonMenberDef(string name, string type) : name(name), type(type) {
+//    }
+//
+//    static int RegistMember(vector<JsonMenberDef> defines, string name, string type) {
+//        JsonMenberDef def(name, type);
+//        defines.push_back(def);
+//    }
+//};
+//
+//#define JSON_DOUBLE(member_name) \
+//  double member_name(){ return boost::get<double>(values[#member_name]); } \
+//  void set_##member_name(double val){ values[#member_name] = val; } \
+//  auto dmy##member_name = JsonMenberDef.RegistMember(this->defines, member_name, "double")
+//
+//
+//#define JSON_STRING(member_name) string member_name(){ return boost::get<string>(values[#member_name]); }
+//
+//
+//struct BASE_MESG {
+//    vector<JsonMenberDef> defines;
+//    map<string, boost::variant<int, double, string> > values;
+//
+//
+//        void from_json(picojson::object req) {
+//        for (auto def : defines) {
+//            auto val = (int)req["options"].get<picojson::object>()[def.name];
+//            if (def.type == "double") {
+//                values[def.name] = val.get<double>();
+//            }
+//            else if (def.type == "string") {
+//                values[def.name] = val.get<string>();
+//            }
+//        }
+//    }
+//};
+//
+//struct OVSERB_MESG : BASE_MESG {
+//    JSON_DOUBLE(lat);
+//    JSON_DOUBLE(lng);
+//    JSON_STRING(current_time)
+//};
+//
+//
+//void f_Obseve2(picojson::object req) {
+//    OVSERB_MESG msg;
+//    msg.from_json(req);
+//
+//    auto lat = msg.lat();
+//    msg.set_lat(136.0);
+//}
 
 // 詳細編集
 void f_EditDetail(
@@ -677,19 +724,72 @@ void f_Observe(
     
     // データ処理
     auto resultData = elem.observe(conn);
-    
-
-
 
     if ((double)resultData.status == _ERROR){
         // 共通エラー処理
        // return error_proc(observe, result);
     }
 
+    //observeオブジェクトをJSONへと展開
+    auto list = resultData.observe_st;
+    picojson::array arr;
+    for (auto i = list.begin(); i != list.end(); i++) {
+        picojson::object obj;
+        // データの追加
+        obj.insert(std::make_pair("subject", picojson::value(i->subject)));
+        obj.insert(std::make_pair("body", picojson::value(i->body)));
+        obj.insert(std::make_pair("svc_data", picojson::value(i->svc_data)));
+        arr.push_back(picojson::value(obj));
+    }
+
     // picojsonオブジェクト
     picojson::object obj;
-    obj.insert(std::make_pair("message", picojson::value(resultData.message)));
     obj.insert(std::make_pair("status", picojson::value((double)resultData.status)));
+    obj.insert(std::make_pair("message", picojson::value(resultData.message)));
+    obj.insert(std::make_pair("notifications", picojson::value(arr)));
+
+    result = obj;
+}
+
+// snooze
+void f_Snooze(
+    sqlite::connection* conn,
+    picojson::object&	req,
+    picojson::object&	result
+) {
+    reminder_element elem;
+
+    // option取得
+    elem.id           = req["options"].get<picojson::object>()["id"].get<double>();
+    elem.current_time = req["options"].get<picojson::object>()["current_time"].get<string>();
+    int snooze_time   = req["options"].get<picojson::object>()["minutes"].get<double>();
+
+    // データ処理
+    auto resultData = elem.snooze(conn);
+
+    //if ((double)resultData.status == _ERROR) {
+    //    // 共通エラー処理
+    //    // return error_proc(observe, result);
+    //}
+
+    ////observeオブジェクトをJSONへと展開
+    //auto list = resultData.observe_st;
+    //picojson::array arr;
+    //for (auto i = list.begin(); i != list.end(); i++) {
+    //    picojson::object obj;
+    //    // データの追加
+    //    obj.insert(std::make_pair("subject", picojson::value(i->subject)));
+    //    obj.insert(std::make_pair("body", picojson::value(i->body)));
+    //    obj.insert(std::make_pair("svc_data", picojson::value(i->svc_data)));
+    //    arr.push_back(picojson::value(obj));
+    //}
+
+    //// picojsonオブジェクト
+    picojson::object obj;
+    obj.insert(std::make_pair("status", picojson::value()));
+    obj.insert(std::make_pair("message", picojson::value()));
+    obj.insert(std::make_pair("current_time", picojson::value()));
+    obj.insert(std::make_pair("next_notify_time", picojson::value()));
 
     result = obj;
 }
