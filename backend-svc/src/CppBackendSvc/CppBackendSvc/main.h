@@ -106,6 +106,17 @@ struct OBSERVE_ST : status_data {
     vector<OBSERVE_DATA> observe_st;
 };
 
+// スヌーズデータ
+struct SNOOZE_ST : status_data {
+    time_t      current_time;       // システムの現在時刻（ISO形式）
+    time_t      next_notify_time;   // 次の通知予定時刻（ISO形式）
+};
+
+// timer_element
+struct timer_element {
+    time_t snooze_time;         // スヌーズ時間（単位は分）
+    time_t current_time_ori;    // 元データの通知設定時刻（notify_datetime）を保存する
+};
 
 // 裏口設定
 extern string uraguchi;
@@ -126,8 +137,8 @@ struct base_model {
 
 struct reminder_element : base_model {
     string title ; //“xxxxxx”,
-    string notify_datetime; // “2018 - 03 - 20T19:32 : 00 + 0900”
-    string term; //“2018 - 03 - 20T19:32 : 00 + 0900”,  // ISO形式
+    string notify_datetime; // “2018 - 03 - 20T19:32 : 00 + 0900”通知時間
+    string term; //“2018 - 03 - 20T19:32 : 00 + 0900”,  // ISO形式　期限
     string memo; //“xxxxxxxxxxxxxxxxxxxxxxx”,
     string finished_at; // “2018-03-20T19:32:00+0900”,  // 完了日
     string created_at; // “2018-03-20T19:32:00+0900”  // 作成日
@@ -136,6 +147,22 @@ struct reminder_element : base_model {
     int    radius;    // 50,         // 半径（単位はメートル）
     string direction; // “out”,  // in:範囲に入ったとき  out:範囲から出たとき
     string current_time;
+    timer_element* timer_elem = NULL;   // 時間関連の保存オブジェクト
+
+    void init_timer_element()
+    {
+        if (timer_elem != NULL) {
+            return;
+        }
+        timer_elem = new timer_element;
+    }
+
+    ~reminder_element() {
+        if (timer_elem == NULL) {
+            return;
+        }
+        delete timer_elem;
+    }
 
     static std::vector<reminder_element> select_all(sqlite::connection* conn, std::vector<string> condition) {
 		std::vector<string> v = { "1=1" };
@@ -220,6 +247,13 @@ struct reminder_element : base_model {
     * @return (OBSERVE_ST) 処理結果
     */
     OBSERVE_ST observe(sqlite::connection* conn);
+
+    /*
+    * @brief snooze
+    * @param (conn) DB Connection オブジェクト
+    * @return (SNOOZE_ST) 処理結果
+    */
+    SNOOZE_ST snooze(sqlite::connection* conn);
 };
 
 
@@ -287,6 +321,8 @@ DEF_API("finish", f_Finish);
 DEF_API("delete", f_Delete);
 DEF_API("clear", f_Clear);
 DEF_API("observe", f_Observe);
+DEF_API("snooze", f_Snooze);
+
 
 // 一覧取得
 //void f_GetList(

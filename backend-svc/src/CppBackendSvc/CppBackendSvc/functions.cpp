@@ -325,6 +325,26 @@ int reminder_element::select(sqlite::connection* conn, int id, reminder_element 
      SNOOZE_ST list;           // 結果リスト
      list.status = _SUCCESS;    // 処理結果ステータス
 
+     /* input
+      command: “snooze”,
+        options {
+                  id: 1,  // スヌーズ対象のデータID
+        current_time: “2018-03-20T19:32:00+0900”,  // ISO形式
+             minutes: 5  // スヌーズ時間（単位は分）
+     */
+
+     /*
+       スヌーズが行われると、現在時刻を起点に minutes で指定された時間後に、
+       無条件に再度通知を発動させなければならない。
+       ただし、元データの通知設定時刻は変更してはいけない。
+       →snooze_timeで対応
+
+       スヌーズ後の再通知発動前に、元データの通知設定時刻が変更された場合は、
+       スヌーズによる再通知をすべて無効とする
+       →current_time_ori
+     */
+
+
 
 
 
@@ -762,7 +782,7 @@ void f_Snooze(
     // option取得
     elem.id           = req["options"].get<picojson::object>()["id"].get<double>();
     elem.current_time = req["options"].get<picojson::object>()["current_time"].get<string>();
-    int snooze_time   = req["options"].get<picojson::object>()["minutes"].get<double>();
+    elem.timer_elem->snooze_time = req["options"].get<picojson::object>()["minutes"].get<double>();
 
     // データ処理
     auto resultData = elem.snooze(conn);
