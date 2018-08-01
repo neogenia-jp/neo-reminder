@@ -10,32 +10,60 @@ module Yoneoka
 
       notifications = []
       @data_accessor.all_read.each do |data|
-        next unless (is_notify_target(data, json_data['options']))
-        @data_accessor.update({'notify':""}, data['id'])
-        notifications.push({subject: data['title'], body: data['memo']})
+        # スヌーズによるターゲットか
+        is_target1 = is_notify_target(data, json_data['options'])
+        @data_accessor.update({'next_notified_at': json_data['options']['current_time']}, data['id']) if is_target1
+
+        # 期限によるターゲットか
+        is_target2 = is_term_target(data, json_data['options'])
+        @data_accessor.update({'term_notified_at': json_data['options']['current_time']}, data['id']) if is_target2
+
+        # 通常の通知によるターゲットか
+        is_target3 = is_notify_target(data, json_data['options'])
+        @data_accessor.update({'notified_at': json_data['options']['current_time']}, data['id']) if is_target3
+
+        # いずれかで通知対象なら配列に追加する
+        notifications.push({subject: data['title'], body: data['memo']}) if (is_target1 || is_target2 || is_target3 )
       end
       {notifications: notifications}
     end
 
     private
 
-    def is_notify_target(data, options)
-      # finished_at 完了なら通知しない
-      return false if (data.has_key?('finished_at'))
-      # 通知時間未設定(＝詳細編集がまだ)なら通知しない
-      return false if (!data.has_key?('notify_datetime'))
+    # スヌーズによるターゲットチェック
+    def is_notify_target_sn(data, options)
+      return false if (data.has_key?('finished_at')) # 完了なら対象外
+      return false if (data.has_key?('next_notified_at')) # スヌーズ通知済みなら対象外
 
-      # 通知時間によるチェック
+      # スヌーズ通知時刻によるチェック
+      return false if (!data.has_key?('next_notify_datetime')) # スヌーズ通知時刻がないなら対象外
       current = Time.parse(options['current_time'])
-      notify_datetime = Time.parse(data['notify_datetime']) # 本来の通知時間
-      if (data.has_key?('next_notify_datetime'))
-        # スヌーズあり
-        next_notify_datetime = Time.parse(data['next_notify_datetime']) # スヌーズの再通知時間
-        return false if !is_target_by_time(current, next_notify_datetime)
-      else
-        # スヌーズなし
-        return false if !is_target_by_time(current, notify_datetime)
-      end
+      next_notify_datetime = Time.parse(data['next_notify_datetime'])
+      return (current > next_notify_datetime)
+    end
+
+    # 期限によるターゲットチェック
+    def is_term_target(data, options)
+      return false if (data.has_key?('finished_at')) # 完了なら対象外
+      return false if (data.has_key?('term_notified_at')) # 期限通知済みなら対象外
+
+      # 期限時刻によるチェック
+      return false if (!data.has_key?('term')) # 期限時刻がないなら対象外
+      current = Time.parse(options['current_time'])
+      term = Time.parse(data['term'])
+      return (current > term)
+    end
+
+    # 通常の通知によるターゲットチェック
+    def is_notify_target(data, options)
+      return false if (data.has_key?('finished_at')) # 完了なら対象外
+      return false if (data.has_key?('notified_at')) # 通知済みなら対象外
+
+      # 通知時刻によるチェック
+      return false if (!data.has_key?('notify_datetime')) # 通知時刻がないなら対象外(＝詳細編集がまだ)
+      current = Time.parse(options['current_time'])
+      notify_datetime = Time.parse(data['notify_datetime'])
+      return false if current < notify_datetime
 
       # 位置情報によるチェック
       # 位置情報チェックをするか否か
@@ -46,20 +74,13 @@ module Yoneoka
         # 位置情報チェックをしないならtrue
         return true
       end
-      distance = calc_distance(options['lat'], options['long'], data['lat'], data['long'])
+        distance = calc_distance(options['lat'], options['long'], data['lat'], data['long'])
       is_inside = distance > data['radius'].to_i
       if (data['direction'] == 'in')
         is_inside
       else
         !is_inside
       end
-    end
-
-    def is_target_by_time(current_datetime, notify_datetime)
-      return false if (current_datetime < notify_datetime) # 通知時間前なら対象外
-      return false if (current_datetime - notify_datetime > 60)
-      # 現在時刻から60秒以内
-      true
     end
 
     def calc_distance(lat1, lng1, lat2, lng2)

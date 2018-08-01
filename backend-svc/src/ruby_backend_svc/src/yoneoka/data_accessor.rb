@@ -5,6 +5,7 @@ require 'time'
 module Yoneoka
   class DataAccessor
     include Singleton
+
     def initialize
       @data_base_path = File.join(File.dirname(__FILE__), 'data')
     end
@@ -30,7 +31,7 @@ module Yoneoka
     # @param contents [Hash] ファイルに書き込む内容
     # @param id [Integer] ファイルID（指定しない場合は次のIDを採番する）
     # @return [Integer] iso8601形式の作成日付
-    def create(contents, id=nil)
+    def create(contents, id = nil)
       # IDがファイル名と二重管理になるため、消しておく
       contents.delete_if {|key, val| key == :id || key == 'id'}
 
@@ -61,6 +62,13 @@ module Yoneoka
       # 更新対象に指定された値を更新する
       # TODO: ファイルの存在確認
       target = read(id)
+
+      # 通知時刻を変更する場合はスヌーズ関連の項目を削除する
+      if (contents.has_key?('notify_datetime'))
+        target.delete('next_notify_datetime')
+        target.delete('next_notified_at')
+      end
+
       File.write(File.join(@data_base_path, "#{id}.json"), target.merge(contents).to_json)
 
       nowtime
@@ -76,13 +84,13 @@ module Yoneoka
     # 次のID
     # @return [Integer] 次のID
     def next_id
-      ids = id_list.map{|i| i.to_i}
+      ids = id_list.map {|i| i.to_i}
       ids.empty? ? 1 : ids.max + 1
     end
 
     # ファイルIDリスト
     def id_list
-      Dir.glob(File.join(@data_base_path, "*")).map { |f_name| File.basename(f_name, ".json").to_i }.sort
+      Dir.glob(File.join(@data_base_path, "*")).map {|f_name| File.basename(f_name, ".json").to_i}.sort
     end
 
   end

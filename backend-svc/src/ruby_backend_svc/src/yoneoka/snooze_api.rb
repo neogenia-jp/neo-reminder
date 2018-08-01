@@ -15,7 +15,6 @@ module Yoneoka
 
       data = {'next_notify_datetime':next_notify_datetime}
       @data_accessor.update(data, id)
-      {created_at: @data_accessor.read(edit_id)['created_at']}
 
       data['current_time'] = current_datetime
       data #returnするのにもう一度書くのがなんかダサい…

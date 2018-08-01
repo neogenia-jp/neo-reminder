@@ -27,6 +27,8 @@ class TestV2 < Test::Unit::TestCase
 
     assert_not_equal '', result, 'No response of service!!!'
 
+    puts result
+
     JSON.parse(result, symbolize_names: true)
   end
 
