@@ -23,12 +23,12 @@ module Yoneoka
         @data_accessor.update({'notified_at': json_data['options']['current_time']}, data['id']) if is_target3
 
         # いずれかで通知対象なら配列に追加する
-        notifications.push({subject: data['title'], body: data['memo']}) if (is_target1 || is_target2 || is_target3 )
+        notifications.push({subject: data['title'], body: data['memo']}) if (is_target1 || is_target2 || is_target3)
       end
       {notifications: notifications}
     end
 
-    private
+    # private
 
     # スヌーズによるターゲットチェック
     def is_notify_target_sn(data, options)
@@ -74,12 +74,12 @@ module Yoneoka
         # 位置情報チェックをしないならtrue
         return true
       end
-        distance = calc_distance(options['lat'], options['long'], data['lat'], data['long'])
-      is_inside = distance > data['radius'].to_i
+      distance = calc_distance(options['lat'], options['long'], data['lat'], data['long'])
+      is_outside = distance > data['radius'].to_i
       if (data['direction'] == 'in')
-        is_inside
+        !is_outside
       else
-        !is_inside
+        is_outside
       end
     end
 

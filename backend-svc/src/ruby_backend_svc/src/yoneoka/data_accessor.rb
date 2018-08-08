@@ -63,9 +63,16 @@ module Yoneoka
       # TODO: ファイルの存在確認
       target = read(id)
 
-      # 通知時刻を変更する場合はスヌーズ関連の項目を削除する
+      # 通知時刻を変更する場合は通知時刻とスヌーズ関連の項目を削除する
       if (contents.has_key?('notify_datetime'))
         target.delete('next_notify_datetime')
+        target.delete('next_notified_at')
+        target.delete('term_notified_at')
+        target.delete('notified_at')
+      end
+
+      # スヌーズ通知時刻を変更する場合はスヌーズ通知時刻を削除する
+      if (contents.has_key?('next_notify_datetime'))
         target.delete('next_notified_at')
       end
 

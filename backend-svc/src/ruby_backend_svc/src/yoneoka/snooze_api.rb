@@ -10,7 +10,7 @@ module Yoneoka
       id = json_data['options']['id']
       minutes = json_data['options']['minutes'].to_i
 
-      current_datetime = Time.parse(options['current_time'])
+      current_datetime = Time.parse(json_data['options']['current_time'])
       next_notify_datetime = current_datetime + minutes * 60
 
       data = {'next_notify_datetime':next_notify_datetime}

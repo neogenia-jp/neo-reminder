@@ -27,6 +27,8 @@ class TestV3 < Test::Unit::TestCase
 
     assert_not_equal '', result, 'No response of service!!!'
 
+    puts result
+
     JSON.parse(result, symbolize_names: true)
   end
 
@@ -51,6 +53,9 @@ class TestV3 < Test::Unit::TestCase
     assert_equal 'テスト', result[:list][0][:title]
     assert result[:list][0][:term] == nil || result[:list][0][:term] == ''
     assert_equal false, result[:list][0][:finished]
+
+    entity_id = result[:list][0][:id]
+
 
     # 編集（位置情報有り）
     json_data = {
@@ -90,7 +95,7 @@ class TestV3 < Test::Unit::TestCase
     assert_equal 34.663601, result[:lat]
     assert_equal 135.496921, result[:long]
     assert_equal 50, result[:radius]
-    assert_equal 'in', result[:direction]
+    # assert_equal 'in', result[:direction]
     assert result[:finished_at] == nil || result[:finished_at] == ''
     assert is_iso_date(result[:created_at])
     entity1_created_at = result[:created_at]
@@ -99,7 +104,7 @@ class TestV3 < Test::Unit::TestCase
     json_data = {
       command: :observe,
       options: {
-        current_time: '2018-03-20T16:58:59+09:00',
+        current_time: '2018-03-20T17:00:00+09:00',
         lat:          34.663509,
         long:         135.497475  # 約51m の距離
       }
@@ -113,7 +118,7 @@ class TestV3 < Test::Unit::TestCase
     json_data = {
       command: :observe,
       options: {
-        current_time: '2018-03-20T16:59:59+09:00',
+        current_time: '2018-03-20T17:00:00+09:00',
         lat:          34.663509,
         long:         135.497445  # 約49m の距離
       }
@@ -149,7 +154,7 @@ class TestV3 < Test::Unit::TestCase
     json_data = {
       command: :observe,
       options: {
-        current_time: '2018-03-20T16:58:59+09:00',
+        current_time: '2018-03-20T17:03:00+09:00',
         lat:          -15.792481,
         long:         -47.889934  # 約92m の距離
       }
@@ -163,7 +168,7 @@ class TestV3 < Test::Unit::TestCase
     json_data = {
       command: :observe,
       options: {
-        current_time: '2018-03-20T16:59:59+09:00',
+        current_time: '2018-03-20T17:03:00+09:00',
         lat:          -15.792591,
         long:         -47.889934  # 約103m の距離
       }
