@@ -188,7 +188,7 @@ class TestV2 < Test::Unit::TestCase
     json_data = {
       command: :observe,
       options: {
-        current_time: '2019-03-31T23:59:58+09:00',
+        current_time: '2019-03-23T23:58:59+09:00',
         lat:          0.0,
         long:         0.0
       }
