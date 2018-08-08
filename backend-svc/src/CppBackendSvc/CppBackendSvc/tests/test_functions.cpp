@@ -1,4 +1,4 @@
-﻿#include <boost/test/unit_test.hpp>
+#include <boost/test/unit_test.hpp>
 #include "../main.h"
 
 
@@ -41,6 +41,10 @@ void InsertTestData(
 	elem.notify_datetime	= "2018-05-05T05:05:05+09:00";
 	elem.term				= "2018-05-05T05:05:05+09:00";
 	elem.memo				= "テストメモ１";
+    elem.latitude           = 34.663601;
+    elem.longitude          = 135.496921;
+    elem.radius             = 50;
+    elem.direction          = "out";
 	// finished(完了)フラグ = TRUEで完了データとする
 	if (finished) {
 		elem.finished_at = "2018-05-05T05:05:05+09:00";
@@ -51,17 +55,6 @@ void InsertTestData(
 
 	// データ投入
 	elem.save(conn);
-
-	//// 投入データ確認
-	//auto result = elem.select_all(conn);
-	//BOOST_CHECK_EQUAL(1, result.size());
-	//BOOST_CHECK_EQUAL(1, result[0].id);
-	//BOOST_CHECK_EQUAL("テストデータ１", result[0].title);
-	//BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", result[0].notify_datetime);
-	//BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", result[0].term);
-	//BOOST_CHECK_EQUAL("テストメモ１", result[0].memo);
-	//BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", result[0].finished_at);
-	//// BOOST_CHECK_EQUAL("", result[0].created_at);		// TODO:時刻
 }
 
 /*
@@ -84,6 +77,10 @@ BOOST_AUTO_TEST_CASE(select)
 	BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", elem.notify_datetime);
 	BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", elem.term);
 	BOOST_CHECK_EQUAL("テストメモ１", elem.memo);
+    BOOST_CHECK_EQUAL(34.663601, elem.latitude);
+    BOOST_CHECK_EQUAL(135.496921, elem.longitude);
+    BOOST_CHECK_EQUAL(50, elem.radius);
+    BOOST_CHECK_EQUAL("out", elem.direction);
 	BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", elem.finished_at);
 	// BOOST_CHECK_EQUAL("", result[0].created_at);		// TODO:時刻
 }
@@ -175,6 +172,10 @@ BOOST_AUTO_TEST_CASE(update)
 	elem.notify_datetime	= "2018-05-05T05:05:05+09:00";
 	elem.term				= "2018-05-05T05:05:05+09:00";
 	elem.memo				= "テストメモ";
+    elem.latitude           = 33.3333;
+    elem.longitude          = 55.5555;
+    elem.radius             = 100;
+    elem.direction          = "in";
 	elem.finished_at		= "2018-05-05T05:05:05+09:00";
 	
 	// 更新実行
@@ -187,6 +188,10 @@ BOOST_AUTO_TEST_CASE(update)
 	BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", result[0].notify_datetime);
 	BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", result[0].term);
 	BOOST_CHECK_EQUAL("テストメモ", result[0].memo);
+    BOOST_CHECK_EQUAL(33.3333, result[0].latitude);
+    BOOST_CHECK_EQUAL(55.5555, result[0].longitude);
+    BOOST_CHECK_EQUAL(100, result[0].radius);
+    BOOST_CHECK_EQUAL("in", result[0].direction);
 	BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", result[0].finished_at);
 }
 
@@ -218,5 +223,43 @@ BOOST_AUTO_TEST_CASE(finish)
 	BOOST_CHECK_EQUAL("2018-05-05T05:05:05+09:00", result[0].finished_at);
 	// BOOST_CHECK_EQUAL("", result[0].created_at);		// TODO:時刻
 }
+/*
+* @brief observeテスト
+*/
+BOOST_AUTO_TEST_CASE(observe)
+{
+    auto conn = init_db("test");
+    reminder_element elem;
+
+    // 対象データ有りテスト-------------------------------------
+
+    // （未完了）テストデータ登録
+    InsertTestData(conn, elem, 1, false);
+
+    // 通知される日時 
+    elem.current_time = "2018-05-05T05:05:05+09:00";
+
+    // observe実行
+    auto targetIDs = elem.observe(conn);
+
+    // observeより取得されたIDを検証
+    BOOST_CHECK_EQUAL(1, targetIDs.size());
+    BOOST_CHECK_EQUAL(1, targetIDs[0]);
+   
+    // 対象データなしテスト-------------------------------------
+
+    // 通知される日時 
+    elem.current_time = "2018-01-01T01:01:01+09:00";
+
+    // observe実行
+    auto targetIDs = elem.observe(conn);
+
+    // observeより取得されたIDを検証
+    // TODO:何の処理して検証したいか決める
+
+    // BOOST_CHECK_EQUAL(0, targetIDs.size());
+}
+
+
 
 BOOST_AUTO_TEST_SUITE_END()

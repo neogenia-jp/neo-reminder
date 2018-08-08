@@ -8,6 +8,7 @@
 #include <boost/algorithm/string/join.hpp>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include "picojson.h"
+#include "Error_proc.h"
 
 using namespace std;
 
@@ -25,6 +26,7 @@ enum CommandType {
 	finish,		// 完了
 	delet,		// 削除
     clear,      // クリア
+    observe,    // observe
 
 	command_maxnum // 最大コマンド数
 };
@@ -46,21 +48,30 @@ sqlite::connection* init_db();
 
 void close_db(sqlite::connection* conn);
 
+
+// 結果データ
+struct status_data {
+    int status;     // ステータスコード
+    string message; // メッセージ（人間が読んで理解できる内容）
+};
+
+// 一覧表示データ(単体)
+struct LIST_DATA {
+    short		id;				// ID番号
+    string		title;			// タイトル
+    time_t		term;			// 日付 (ISO形式)
+};
+
 // 一覧表示データ
-struct LIST_ST {
-	short		id;				// ID番号
-	string		title;			// タイトル
-	time_t		term;			// 日付 (ISO形式)
+struct LIST_ST : status_data {
+    vector<LIST_DATA> list_st;
 };
 
 // 新規作成データ
-struct CREATE_ST {
-	string		status;		// ステータス　(OK/Error)
-	string		message;	// メッセージ
-};
+struct CREATE_ST : status_data {};
 
 // 詳細表示データ
-struct DETAIL_ST {
+struct DETAIL_ST : status_data {
 	short		id;					// ID番号
 	string		title;				// タイトル
 	time_t		notify_datetime;	// 日付
@@ -71,23 +82,40 @@ struct DETAIL_ST {
 };
 
 // 編集データ
-struct EDIT_ST {
-	string		status;			// ステータス　(OK/Error)
-	string		message;		// メッセージ
+struct EDIT_ST : status_data {
 	time_t		created_at;		// 作成日
 };
 
 // 完了データ
-struct FINISH_ST {
-	string		status;			// ステータス　(OK/Error)
-	string		message;		// メッセージ
+struct FINISH_ST : status_data {
 	time_t		finished_at;	// 完了日
 };
 
 // 削除データ
-struct DELETE_ST {
-	string		status;			// ステータス　(OK/Error)
-	string		message;		// メッセージ
+struct DELETE_ST : status_data {};
+
+// observeデータ（単体）
+struct OBSERVE_DATA {
+    string subject;             // 通知のタイトル等
+    string body;                // 通知内容の本文
+    string svc_data;            // サービスごとの自由なデータ
+};
+
+// observeデータ
+struct OBSERVE_ST : status_data {
+    vector<OBSERVE_DATA> observe_st;
+};
+
+// スヌーズデータ
+struct SNOOZE_ST : status_data {
+    time_t      current_time;       // システムの現在時刻（ISO形式）
+    time_t      next_notify_time;   // 次の通知予定時刻（ISO形式）
+};
+
+// timer_element
+struct timer_element {
+    time_t snooze_time;         // スヌーズ時間（単位は分）
+    time_t current_time_ori;    // 元データの通知設定時刻（notify_datetime）を保存する
 };
 
 // 裏口設定
@@ -107,14 +135,34 @@ struct base_model {
     virtual int update(sqlite::connection* conn) = 0;
 };
 
-
 struct reminder_element : base_model {
     string title ; //“xxxxxx”,
-    string notify_datetime; // “2018 - 03 - 20T19:32 : 00 + 0900”
-    string term; //“2018 - 03 - 20T19:32 : 00 + 0900”,  // ISO形式
+    string notify_datetime; // “2018 - 03 - 20T19:32 : 00 + 0900”通知時間
+    string term; //“2018 - 03 - 20T19:32 : 00 + 0900”,  // ISO形式　期限
     string memo; //“xxxxxxxxxxxxxxxxxxxxxxx”,
     string finished_at; // “2018-03-20T19:32:00+0900”,  // 完了日
     string created_at; // “2018-03-20T19:32:00+0900”  // 作成日
+    double latitude;  //  34.663601,   // 緯度
+    double longitude; // 135.496921,  // 経度
+    int    radius;    // 50,         // 半径（単位はメートル）
+    string direction; // “out”,  // in:範囲に入ったとき  out:範囲から出たとき
+    string current_time;
+    timer_element* timer_elem = NULL;   // 時間関連の保存オブジェクト
+
+    void init_timer_element()
+    {
+        if (timer_elem != NULL) {
+            return;
+        }
+        timer_elem = new timer_element;
+    }
+
+    ~reminder_element() {
+        if (timer_elem == NULL) {
+            return;
+        }
+        delete timer_elem;
+    }
 
     static std::vector<reminder_element> select_all(sqlite::connection* conn, std::vector<string> condition) {
 		std::vector<string> v = { "1=1" };
@@ -192,8 +240,21 @@ struct reminder_element : base_model {
     * @return 1:削除エラー
     */
     vector<int> clear(sqlite::connection* conn, string option);
-};
 
+    /*
+    * @brief observe
+    * @param (conn) DB Connection オブジェクト
+    * @return (OBSERVE_ST) 処理結果
+    */
+    OBSERVE_ST observe(sqlite::connection* conn);
+
+    /*
+    * @brief snooze
+    * @param (conn) DB Connection オブジェクト
+    * @return (SNOOZE_ST) 処理結果
+    */
+    SNOOZE_ST snooze(sqlite::connection* conn);
+};
 
 
 struct FUNC_ENTRY {
@@ -259,6 +320,8 @@ DEF_API("edit", f_EditDetail);
 DEF_API("finish", f_Finish);
 DEF_API("delete", f_Delete);
 DEF_API("clear", f_Clear);
+DEF_API("observe", f_Observe);
+DEF_API("snooze", f_Snooze);
 
 
 // 一覧取得
@@ -268,7 +331,6 @@ DEF_API("clear", f_Clear);
 //	picojson::object&	result
 //);
 //static FuncRegestorer dmy1("list", f_GetList);
-
 
 //
 //// 登録
